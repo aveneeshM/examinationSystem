@@ -197,6 +197,10 @@ function nameCheck() {
 
 function timeCheck() {
 	var returnTime;
+	var presentTS = new Date();
+	var timeIndex;
+	var date = $.datepicker.formatDate('yy/mm/dd',presentTS);
+	
 	$.ajax({
 		 url:"../cfc/configExam.cfc",
 		 data: {
@@ -216,13 +220,30 @@ function timeCheck() {
 		}
 		
 	});
+	
 	allTime=["00:00:00","01:00:00","02:00:00","03:00:00","04:00:00","05:00:00","06:00:00","07:00:00",
 		"08:00:00","09:00:00","10:00:00","11:00:00","12:00:00","13:00:00","14:00:00",
 		"15:00:00","16:00:00","17:00:00","18:00:00","19:00:00","20:00:00","21:00:00",
-		"22:00:00","23:00:00"]
+		"22:00:00","23:00:00"];
+	
 	returnTime = allTime.filter( function( el ) {
 		  return !returnTime.includes( el );
 		});
+
+	
+	if (date == $("#datetext").val()){
+		var datetext = presentTS.toTimeString().split(' ')[0];
+		
+		$.each(returnTime, function( index, value ) {
+			  if(value <= datetext){
+				  timeIndex =index;
+			  }
+			});
+		returnTime = returnTime.slice(timeIndex+1);
+	}
+	
+	
+	
 	return returnTime;
 
 }

@@ -65,7 +65,7 @@ $(document).ready(function () {
 				 method : "getQuestion",
 				 questionID : extractedID
 			},
-			async:false,
+			//async:false,
 			type:"POST",
 			success: function(data){
 			console.log(data);
@@ -110,10 +110,11 @@ $(document).ready(function () {
 				return false;
 	        }
 			else{
-				setInterval(function(){$('#myModal').modal('hide'); }, 100);
+				//setInterval(function(){$('#myModal').modal('hide'); }, 100);
 
-				//$('#myModal').modal('hide');
-				location.reload(true);
+				$('#myModal').modal('hide');
+				//location.reload(true);
+				setInterval(function(){location.reload(true); }, 400);
 				
 	        }
 

@@ -47,8 +47,7 @@
 <!---component object to check if atleast one exam is present and then display all exams--->
 <cfset examObj = CreateObject("Component", "examinationSystem.cfc.exams") />
 <cfset examObjQuery = examObj.examAll() />
-<!--- <cfset examObjQuestion = examObj.questionAll() /> --->
-<!--- <cfif #examObj.examExists()#> --->
+
 <cfif #examObjQuery.recordCount#>
 
 	<div class="examListTable">

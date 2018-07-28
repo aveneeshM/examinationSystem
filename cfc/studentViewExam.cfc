@@ -39,15 +39,21 @@
 		  </cftry>
 
 
-		   <cfset testArray = arraynew(1)>
+		   <cfset var testArray = arraynew(1)>
+		   <cfset var arrayCounter = 1>
 		   <cfloop query="testAllQuery">
 
 
-           <cfif NOT ((testAllQuery.startDate EQ DATEFORMAT(NOW(),"yyyy-mm-dd"))
-		              AND (testAllQuery.startTime LT TIMEFORMAT(NOW(),"HH:mm:ss")))>
-				 <cfset testArray[#currentRow#] =[testAllQuery.testID, testAllQuery.name,
+
+           <cfif (testAllQuery.startDate EQ DATEFORMAT(NOW(),"yyyy-mm-dd")
+		              AND timeformat(testAllQuery.startTime,'HH:mm:ss') GT TIMEFORMAT(NOW(),"HH:mm:ss"))
+		          OR (testAllQuery.startDate GT DATEFORMAT(NOW(),"yyyy-mm-dd"))>
+
+				 <cfset testArray[arrayCounter] =[testAllQuery.testID, testAllQuery.name,
 				     testAllQuery.duration, #DATEFORMAT(testAllQuery.startDate,"dd-mmm-yyyy")#,
 				     TIMEFORMAT(testAllQuery.startTime,"HH:mm:ss")] />
+
+				     <cfset var arrayCounter = arrayCounter + 1>
 		   </cfif>
 	       </cfloop>
 		  <cfreturn testArray>

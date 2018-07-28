@@ -14,8 +14,9 @@ $(document).ready(function () {
 	
 //Add on click event to table rows
 	$("#examSelectTable tbody").on('click', 'tr', function () {
-	    var extractedID = $(this).find(".examID").text();
-	    //extractedID = extractedID.substr(4);
+		
+
+		var extractedID = $(this).find(".examID").text();
 	    $.ajax({
 			 url:"../cfc/exams.cfc",
 			 data: {
@@ -26,24 +27,18 @@ $(document).ready(function () {
 			async:false,
 			success: function(data){
 			console.log(data);
+			if ( $.fn.DataTable.isDataTable('#questionSelectTable') ) {
+		    	  $('#questionSelectTable').DataTable().destroy();
+		    	}
 		    displayQuestion(data);
 		    
-		    
-		    
-		    if ( $.fn.dataTable.isDataTable( '#questionSelectTable' ) ) {
-		        $('#questionSelectTable').DataTable();
-		    }
-		    else {
-		         		    
-				    $('#questionSelectTable').DataTable({
-				    	"aaSorting": [0,'desc'],
-				    	"ordering": false
-				    	  });
-		    }
-		    
-		    
-		    
-
+		    $('#questionSelectTable').DataTable({
+				    	"columns": [
+				            null,
+				            { "orderDataType": "dom-checkbox" }
+				        ],
+				        "aaSorting": [[1,'desc'],[0,'asc']],
+				        });
 			},
 			error: function(){
 				alert("AJAX error");
@@ -75,7 +70,6 @@ $(document).ready(function () {
 				return false;
 	        }
 			else{
-				console.log(data);
 				$('#myModal').modal('hide');
 				$("#testQuesForm")[0].reset();
 				
@@ -94,20 +88,26 @@ $(document).ready(function () {
 function displayQuestion(data){
 	
    var question = $.parseJSON(data);
-   $("#questionSelectTable > tbody").html("")
+   $("#questionSelectTable > tbody").html("");
+
+   
     for(var i=0; i<question.length;i++){
     	var markup = '<tr><td align="center">' + question[i][1] + 
     	'</td><td align="center"><input type="checkbox"'+ question[i][3]+' name="questionSelector[]" value='+
     	question[i][0]+'></td></tr>';
     	$("#questionSelectTable tbody").append(markup);
     	
-    	$('#myModal').modal('show'); 
     }
+	$('#myModal').modal('show'); 
     $('#testID').val(question[1][2]);
     
 }
 
-
+$.fn.dataTable.ext.order['dom-checkbox'] = function  ( settings, col ){
+    return this.api().column( col, {order:'index'} ).nodes().map( function ( td, i ) {
+        return $('input', td).prop('checked') ? '1' : '0';
+    } );
+}
 
 
 

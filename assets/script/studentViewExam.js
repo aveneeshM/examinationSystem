@@ -1,32 +1,7 @@
 $(document).ready(function () {	
 
-//get list of upcoming tests
-	 $.ajax({
-		 url:"../cfc/studentViewExam.cfc",
-		 data: {
-			 method : "getTest"
-		},
-		async:false,
-		type:"POST",
-		success: function(data){
-			console.log(data);
-	    displayTests(data);
-	    $('#examDisplayTable').DataTable( {
-	    	paging:false,
-	    	scrollY:"480px",
-			scrollCollapse: true,
-	    	"aaSorting": [[1,'asc'], [2,'asc']],
-	        "columnDefs": [
-	        {"className": "dt-center", "targets": "_all"},
-	        { type: 'date-dd-mmm-yyyy', targets: 1 }
-	      ]
-	    } );
-		},
-		error: function(){
-			alert("AJAX error");
-			return false;
-		}
-	});
+//display all upcoming tests
+	futureTests(generateTests);
 //start test button response 	 
 	 $(".selectTest").on("click", function(e){
 	        e.preventDefault();
@@ -53,11 +28,8 @@ function displayTests(data){
     	tests[i][0] +'>Add Test</button></td></tr>';
        	$("#examDisplayTable tbody").append(markup);
     	
-    } 
-    
-    
+    }  
 }
-
 
 
 //function to record users response
@@ -80,4 +52,37 @@ function addExam(testID){
 		}
 	});
  
+}
+
+function futureTests(callback){
+//get list of upcoming tests
+$.ajax({
+	 url:"../cfc/studentViewExam.cfc",
+	 data: {
+		 method : "getTest"
+	},
+	async:false,
+	type:"POST",
+	success: callback,
+	error: function(){
+		alert("AJAX error");
+		return false;
+	}
+});
+}
+
+//
+function generateTests(data){
+	console.log(data);
+    displayTests(data);
+    $('#examDisplayTable').DataTable( {
+	   paging:false,
+	   scrollY:"480px",
+	   scrollCollapse: true,
+	   "aaSorting": [[1,'asc'], [2,'asc']],
+       "columnDefs": [
+         {"className": "dt-center", "targets": "_all"},
+         { type: 'date-dd-mmm-yyyy', targets: 1 }
+       ]
+    });
 }

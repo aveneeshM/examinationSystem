@@ -57,9 +57,9 @@
 		 </cfcatch>
 		 </cftry>
 		 <cfset questionArr = arraynew(1)>
-		 <cfset myList = ValueList(questionSelectedQuery.questionID)>
+		 <cfset selectedQuestionID = ValueList(questionSelectedQuery.questionID)>
 		 <cfloop query="questionAllQuery">
-			 <cfif ListFind(myList, questionAllQuery.questionID)>
+			 <cfif ListFind(selectedQuestionID, questionAllQuery.questionID)>
 				 <cfset var checked = "checked">
 				 <cfelse>
 				 <cfset var checked = "">

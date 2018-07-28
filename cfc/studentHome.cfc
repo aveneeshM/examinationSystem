@@ -59,7 +59,7 @@
 
 
 
-<!---selects all chosen test of logged in user--->
+<!---!!Not used, Delete this!!selects all chosen test of logged in user--->
 	   <cffunction name="getTestStudent" access="remote" returnformat="JSON">
 		   <cftry>
 		    <cfquery name="testStudentAllQuery" datasource="examinationSystem">
@@ -85,7 +85,7 @@
 
 
 
-<!---starts test if current time is in start time window of 15 mins---->
+<!---starts test if current time is in start time window of 15(59 for now) mins---->
 	   <cffunction name="checkTest" access="remote" returnformat="JSON">
 		   <cfargument name="testID" type="numeric" required="true" >
 		   <cftry>
@@ -112,7 +112,7 @@
 		   </cfcatch>
 		   </cftry>
 
-		   <cfif testQuery.startDate EQ DATEFORMAT(NOW(),"yyyy-mm-dd")>
+		   <cfif DATEFORMAT(testQuery.startDate,"yyyy-mm-dd") EQ DATEFORMAT(NOW(),"yyyy-mm-dd")>
 
 		      <cfset checkTime= TIMEFORMAT(DateAdd("n",59,testQuery.startTime),"HH:mm:ss")>
 
@@ -122,7 +122,7 @@
 			          <cfif  rowCountQuery.recordCount NEQ 0>
 
 			            <cfset Session.testData = {'endTestTime' =
-			               TIMEFORMAT(DateAdd("H",testQuery.duration,testQuery.startTime),"HH:mm:ss"),
+			               TIMEFORMAT(DateAdd("h",testQuery.duration,testQuery.startTime),"HH:mm:ss"),
 			               'correct' = 0,
 			               'total' = rowCountQuery.recordCount,
 			               'testID' = arguments.testID,
@@ -226,7 +226,7 @@
 		   <cfelse>
 		   <!--- If new choice is correct and previous choice was wrong --->
 		   <cfif ( (arguments.selectedOption eq resultQuery.isCorrect)
-		      AND (NOT resultQuery.isCorrect eq structFind(session.testData.testResponse, "#arguments.questionID#"))
+		         AND (NOT resultQuery.isCorrect eq structFind(session.testData.testResponse, "#arguments.questionID#"))
 		          )>
 			         <cfset session.testData.correct = session.testData.correct + 1>
 			         <cfset temp=StructInsert(session.testData.testResponse,"#arguments.questionID#",
@@ -235,7 +235,7 @@
 
 			<!--- If new choice is wrong and previous choice was also wrong --->
 			<cfif ( (NOT arguments.selectedOption eq resultQuery.isCorrect)
-		      AND (NOT resultQuery.isCorrect eq structFind(session.testData.testResponse, "#arguments.questionID#"))
+		          AND (NOT resultQuery.isCorrect eq structFind(session.testData.testResponse, "#arguments.questionID#"))
 		          )>
 			         <cfset temp=StructInsert(session.testData.testResponse,"#arguments.questionID#",
 			                arguments.selectedOption,true)>
@@ -243,7 +243,7 @@
 
 			<!--- If new choice is wrong and previous choice was correct --->
 			<cfif ( (NOT arguments.selectedOption eq resultQuery.isCorrect)
-		      AND (resultQuery.isCorrect eq structFind(session.testData.testResponse, "#arguments.questionID#"))
+		          AND (resultQuery.isCorrect eq structFind(session.testData.testResponse, "#arguments.questionID#"))
 		          )>
 			         <cfset session.testData.correct = session.testData.correct - 1>
 			         <cfset temp=StructInsert(session.testData.testResponse,"#arguments.questionID#",
@@ -254,14 +254,14 @@
 		   <cfreturn true>
 	   </cffunction>
 
-
-
 <!---Validation at Submit--->
 		<cffunction name="finalResult" access="remote" returnformat="JSON">
 			<cfargument name="testID" type="numeric" required="true" >
+
 			<cfif NOT  structKeyExists(session, "testData")>
 			   <cfreturn "submitted">
 			</cfif>
+
 			<cftry>
 		    <cfif TIMEFORMAT(Now(),"HH:mm:ss") GT Session.testData.endTestTime>
 			   <cfquery result="saveFaultResultQuery" datasource="examinationSystem">

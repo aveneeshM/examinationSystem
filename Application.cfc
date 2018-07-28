@@ -12,6 +12,7 @@
     <cfset THIS.ApplicationTimeout = CreateTimeSpan( 1, 0, 0, 0 ) />
     <cfset THIS.datasource = "examinationSystem" />
 	<cfset THIS.sessionManagement="Yes" />
+	<cfset THIS.sessiontimeout = #CreateTimeSpan(1,0,0,0)# />
 
     <cffunction name="OnApplicationStart" returntype="boolean">
         <cfreturn true />

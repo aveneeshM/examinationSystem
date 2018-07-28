@@ -7,6 +7,7 @@ var currentTestRow;
 $(document).ready(function () {	
 	
 //get list of selected tests
+
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
@@ -143,7 +144,7 @@ function displayTests(data){
     
 }
 
-
+//function to validate ongoing test by checking if test session exists
 function validateOngoingTest(){
 	var reloadCheck= 0;
 	 $.ajax({
@@ -176,9 +177,6 @@ function validateOngoingTest(){
 	 }
 	
 }
-
-
-
 
 //function to start test
 function displayExam(ID){
@@ -276,7 +274,6 @@ function createTest(){
  
 }
 
-
 //function to record users response
 function saveResult(questionID,checked){
 	 $.ajax({
@@ -333,6 +330,10 @@ function finalResult(){
 		}
 	});
 }
+
+//function to get duration of selected test to set timer
+
+//get duration at test start for timer
 function duration(){
 	var currentTestDuration;
 	$.ajax({
@@ -353,25 +354,26 @@ function duration(){
 	});
 	return currentTestDuration;
 }
+
+//function to start timer at test start and implement force submit when duration exceeds
+
+//function to start timer at test start. Clears interval and force submits test at exam end
 function timer(n){
 	
 	var dayNow = new Date();
     var minutes = dayNow.getMinutes() + 1;
+ // Set the time we're counting down to
     n= (n*60*60*1000)- (minutes*60*1000);
+ // Define start counter for timer
     var count =0;
 	
-	// Set the time we're counting down to
-	//var countDownTime =  new Date(testStartTime);
-	    //countDownTime.setHours(countDownTime.getHours() +n);
-	   // console.log(countDownTime);
-
+	
+	
 	// Update the count down every 1 second
 	var x = setInterval(function() {
 
-	    // Get present date and time
-	    //var now = new Date().getTime();
-	    
-	    // Find the distance between now and the count down date
+
+	    // Find the distance between counter and set time
 	    var distance =n - count;
 	    count = count+1000;
 	    
