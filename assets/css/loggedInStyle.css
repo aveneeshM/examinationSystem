@@ -1,0 +1,175 @@
+.tableRow {
+    display: table-cell;
+    vertical-align: middle;
+    float:left;
+    display:inline;
+
+
+}
+.tableRow textarea{
+font-size: 16px;
+
+
+}
+.tableRow span,sup,checkbox{
+vertical-align:top;
+
+}
+.tableCell {
+  width: 50%;
+  background-color:#ffffff;
+  margin: auto;
+  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  }
+ .left{
+ float:left;
+ }
+  .right{
+ float:right;
+ }
+ .label{
+ width:10vw;
+ }
+.checkbox{
+	margin-left:10vw;
+}
+select{
+  width: 174px;
+  padding-left: 7px;
+  font-size:16px;
+}
+.smallMargin{
+ margin-left:35px;;
+}
+.largeMargin{
+ margin-left:115px;
+}
+.largePadding{
+ padding-left:35px;
+}
+#addExamData input{
+	height: 22px;
+	
+}
+.addQuestionButton{
+	width:120px;
+	margin-right:2.8vw;
+	font-family:montserrat;
+}
+#addExamData{
+	background-color: rgba(255, 255, 255, 0.5);
+	color: #000000 ;
+	font-family: montserrat;
+	position: relative;
+	width:90%;
+	margin:auto;
+	margin-top: 2.5vw;
+	padding: 40px 0px 0px 70px;
+	height:10vw;
+}
+.examList{
+	background-color: rgba(255, 255, 255, 0.5);
+	color: #000000 ;
+	font-family: montserrat;
+	position: relative;
+	width:78%;
+	margin:auto;
+	margin-top: 1.5vw;
+	padding: 40px 0px 0px 70px;
+	margin-bottom:1vw;
+
+}
+.Display{
+
+	padding: 0px 4px 0px 4px;
+
+
+}
+.list-group{
+	list-style-type: none;
+	display: table;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+}
+.li{
+	line-height: 20px;
+    list-style: none;
+    text-align: -webkit-match-parent;
+}
+.list-group-item{
+    cursor: pointer;
+}
+.questionList{
+	background-color: rgba(255, 255, 255, 0.5);
+	color: #000000 ;
+	font-family: montserrat;
+	width:80%;
+
+	margin-top: 3vw;
+	padding: 40px 4px 4px 4px;
+	margin-bottom:1vw;
+	float:left;
+
+}
+.examListTable{
+	background-color: rgba(255, 255, 255, 0.5);
+	color: #000000 ;
+	font-family: montserrat;
+	position: relative;
+	width:78%;
+	margin:auto;
+	margin-top: 1.5vw;
+	padding: 30px 4px 4px 4px;
+	margin-bottom:1vw;
+
+}
+.examDisplayTable{
+	background-color: rgba(255, 255, 255, 0.5);
+	color: #000000 ;
+	font-family: montserrat;
+	position: relative;
+	width:78%;
+	margin:auto;
+	margin-top: 1.5vw;
+	padding: 40px 4px 4px 4px;
+	margin-bottom:1vw;
+
+}
+.questionStatus{
+	width:10%;
+	float:left;
+	padding:40px 22px 0px 30px;
+	margin-top:3vw;
+	
+}
+.checkbox1 {
+    width: 15px;
+    height: 15px;
+    background: #ff4500;
+
+
+    border-radius: 100%;
+    position: relative;
+    cursor:pointer;
+    margin-bottom:6px;
+
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
+}
+.checkbox1 input[type=checkbox]:checked {
+    background-color: #26ca28;
+}
+
+.hiddenColumn{
+	display:none !important;
+}
+#timePicker{
+	width:320px;
+}
+.testFieldset{
+	padding:5px 5px 5px 5px;
+	border-color: darkorange;
+	margin-bottom: 6px;
+	font-size:18px;
+}
