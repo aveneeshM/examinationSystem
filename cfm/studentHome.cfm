@@ -32,22 +32,13 @@
 
 		</div><br>
 <!--header end -->
-
-
-
-
-
-
-
-
+<!---Upcoming Exam Table--->
 <h3 class="largeMargin largePadding">Exams:</h3><br>
-
-
 
 <div class="examList Display">
 	<form class="examDisplayForm" id="examDisplayForm" method="POST">
 				<input type="hidden" id="testID">
-		<div id="countdowntimer"><span id="future_date"><span></div>
+	<!---	<div id="countdowntimer"><span id="future_date"><span></div>--->
 			<table id="examDisplayTable" class="display">
 				<thead>
 					<tr>
@@ -60,18 +51,16 @@
                <tbody>
 			</tbody>
           </table>
-
-
-			</form>
+		</form>
 	</div>
-
+<!---Test Modal--->
 	<div class="modal hide fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Select Questions</h4>
+          <h4 class="modal-title" >Test Window&nbsp;<span id="timer"></span></h4>
         </div>
         <div class="modal-body">
 			<form class="onlineTestForm" id="onlineTestForm" method="POST">
@@ -79,19 +68,11 @@
 
         </div>
         <div class="modal-footer">
-			<button type="button" class="btn btn-default left" id="examSubmit">Submit Test</button>
-			<button type="button" class="btn btn-default" id="optionNext">Next</button>
-
+			<button type="button" class="btn btn-default left" id="examNext">Next Question</button>
+			<button type="button" class="btn btn-default" id="examSubmit">Submit Test</button>
         </div>
       </div>
-
-
   </div>
-
 </div>
-
-
-
-
 </body>
 </html>

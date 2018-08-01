@@ -13,8 +13,6 @@
     <cfset THIS.datasource = "examinationSystem" />
 	<cfset THIS.sessionManagement="Yes" />
 
-
-
     <cffunction name="OnApplicationStart" returntype="boolean">
         <cfreturn true />
     </cffunction>

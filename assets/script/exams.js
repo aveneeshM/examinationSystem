@@ -112,7 +112,9 @@ function displayQuestion(data){
    var question = $.parseJSON(data);
    $("#questionSelectTable > tbody").html("");
     for(var i=0; i<question.length;i++){
-    	var markup = '<tr><td align="center">' + question[i][1] + '</td><td align="center"><input type="checkbox" name="questionSelector[]" value='+question[i][0]+'></td></tr>';
+    	var markup = '<tr><td align="center">' + question[i][1] + 
+    	'</td><td align="center"><input type="checkbox" name="questionSelector[]" value='+
+    	question[i][0]+'></td></tr>';
     	$("#questionSelectTable tbody").append(markup);
     	$('#myModal').modal('show'); 
     }

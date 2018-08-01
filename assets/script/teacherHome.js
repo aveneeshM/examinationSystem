@@ -1,10 +1,9 @@
 $(document).ready(function () {
-	
-	
 	$('#questionSelectTable').DataTable({
 
 		info:false,
 		ordering:false,
+//allign elements at centre
 		"columnDefs": [
 	        {"className": "dt-center", "targets": "_all"}
 	      ],

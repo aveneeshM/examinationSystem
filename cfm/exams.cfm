@@ -37,7 +37,7 @@
 			</div>
 		</div><br>
 <!--header end -->
-
+<!---component object to check if atleast one exam is present and then display all exams--->
 <cfset examObj = CreateObject("Component", "examinationSystem.cfc.exams") />
 <cfset examObjQuery = examObj.examAll() />
 <cfset examObjQuestion = examObj.questionAll() />
@@ -74,10 +74,7 @@
 			</tbody>
           </table>
 </div>
-
-
-
-
+<!---Modal to add questions to a test--->
 	<div class="modal hide fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -99,20 +96,14 @@
                <tbody>
 			</tbody>
           </table>
-
-
-			</form>
-
+		</form>
         </div>
         <div class="modal-footer">
 			<button type="button" class="btn btn-default left" id="quesSubmit">Add</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
-
-
   </div>
-
 </div>
 
 	<cfelse>

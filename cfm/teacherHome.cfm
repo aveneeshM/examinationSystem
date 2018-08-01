@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.2/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/b-1.5.2/datatables.min.js"></script>
+<!---cdn for data table button--->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
@@ -115,22 +116,14 @@
                <tbody>
 			</tbody>
           </table>
-
-
-			</form>
-
-
-
+		</form>
         </div>
         <div class="modal-footer">
-			<button type="button" class="btn btn-default left" id="optionSubmit">Submit Changes</button>
+		  <button type="button" class="btn btn-default left" id="optionSubmit">Submit Changes</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
-
-
   </div>
-
 </div>
 <cfelse>
 <!---No questions present--->
