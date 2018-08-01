@@ -8,7 +8,7 @@
 <cfcomponent accessors="true" displayname="Application" output="false" persistent="false">
 
     <!--- Set up the application. --->
-    <cfset THIS.Name = "examinationSystem" />
+    <cfset THIS.Name = "examinationSystema" />
     <cfset THIS.ApplicationTimeout = CreateTimeSpan( 1, 0, 0, 0 ) />
     <cfset THIS.datasource = "examinationSystem" />
 	<cfset THIS.sessionManagement="Yes" />

@@ -2,6 +2,10 @@
 /////for select input..status:not started
 var optionArray=[];
 $(document).ready(function () {
+	
+	//$('input[type="checkbox"]').on('change', function() {
+		//   $('input[type="checkbox"]').not(this).prop('checked', false);
+		//});
 	   
 	   $("#button").on("click", function () {
 	        if($("#question").val().length == 0 || $("#option1").val().length == 0 ||
@@ -11,8 +15,8 @@ $(document).ready(function () {
 	        }
 	        else{
 	        	var val = 0;
-	            $(':checkbox:checked').each(function(i){
-	              
+	          //  $(':checkbox:checked').each(function(i){
+	        	$(':radio:checked').each(function(i){
 	            	  val=1;
 	            	  optionArray[i]=$(this).val();
 	              
@@ -21,7 +25,7 @@ $(document).ready(function () {
 		        	addQuestion(optionArray);
 		        }
 		        else{
-		        	alert("Select answer(s)");
+		        	alert("Select answer");
 		        	return false;
 		        }
 	        }

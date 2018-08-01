@@ -75,14 +75,15 @@ select{
 	position: relative;
 	width:78%;
 	margin:auto;
-	margin-top: 1.5vw;
+	margin-top: 1vw;
 	padding: 40px 0px 0px 70px;
 	margin-bottom:1vw;
 
 }
 .Display{
 
-	padding: 0px 4px 0px 4px;
+	padding: 4px 4px 0px 4px;
+	position:static;
 
 
 }
@@ -132,7 +133,7 @@ select{
 	position: relative;
 	
 	margin:auto;
-	margin-top: 1.8vw;
+	margin-top: 2vw;
 	padding: 4px 4px 4px 4px;
 	margin-bottom:0.5vw;
 

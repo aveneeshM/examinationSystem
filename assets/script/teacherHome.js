@@ -10,12 +10,12 @@ $(document).ready(function () {
 	      dom: 'Bfrtip',
 	        buttons: [
 	            {
-	                extend: 'pdfHtml5',
+	                extend: 'pdf',
 	                orientation: 'landscape',
 	                pageSize: 'LEGAL',
 	                exportOptions: {
 	                    columns: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
-	                }
+	                },
 	            }
 	        ],
 	        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -87,7 +87,7 @@ $(document).ready(function () {
 	
 	$('#optionSubmit').click(function(e) {
 		var checked = [];
-        $('#optionSelectTable :checkbox:checked').each(function(i){
+        $('#optionSelectTable :radio:checked').each(function(i){
       	  checked[i]=$(this).val();
         
       });
@@ -153,7 +153,8 @@ function displayQuestion(data){
    		}
     	i--;
    		tempID = i+1;
-    	var markup = '<tr><td align="center"> <input type="checkbox" name="optionSelector[]" value='+ tempID +' '+check+' ></td><td align="center">'+question[i+2]+'</td></tr>';
+    	var markup = '<tr><td align="center"> <input type="radio" name="optionSelector" value='
+    		+ tempID +' '+check+' ></td><td align="center">'+question[i+2]+'</td></tr>';
        	$("#optionSelectTable tbody").append(markup);
     	$('#myModal').modal('show'); 
     } 

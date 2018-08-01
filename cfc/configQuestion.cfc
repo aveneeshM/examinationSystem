@@ -6,19 +6,31 @@
   --- date:   7/26/18
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
-	<cffunction name="testInfo" access="public" returntype="array">
+
+  <cffunction name="testInfo" access="public" returntype="array">
+	<cftry>
 	<cfquery name="testInfoQuery" datasource="examinationSystem">
           select name from tests
 	</cfquery>
+		 <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cfset message="#cfcatch.cause.message#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+					  Message: #message#" />
+		</cfcatch>
+		</cftry>
+
 	<cfset myarray=arraynew(1)>
+	<cfloop query = "testInfoQuery">
+    <cfset myarray[CurrentRow]=#name#>
+    </cfloop>
+    <cfreturn #myarray#/>
+  </cffunction>
 
-<cfloop query = "testInfoQuery">
-<cfset myarray[CurrentRow]=#name#>
-</cfloop>
-<cfreturn #myarray#/>
-	</cffunction>
-
-	<cffunction name="addQuestion" access="remote" returntype="string" returnformat="JSON">
+  <cffunction name="addQuestion" access="remote" returntype="string" returnformat="JSON">
 	<cfargument name="question" type="string" required="true" >
 	<cfargument name="opt1" type="string" required="true" >
 	<cfargument name="opt2" type="string" required="true" >
@@ -31,10 +43,7 @@
 		<cfreturn "does not">
 	</cfif>
 	<!---><cfset var correctString = arrayToList(arguments.correct)>--->
-
-
-
-
+	<cftry>
 	<cfquery result="insertOptions" datasource="examinationSystem">
 			insert into questions
 			(
@@ -52,9 +61,17 @@
 		    <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.correct#" />
 		    )
 	</cfquery>
-
-
 	<cfreturn true/>
-	</cffunction>
+		 <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cfset message="#cfcatch.cause.message#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+					  Message: #message#" />
+		</cfcatch>
+		</cftry>
+  </cffunction>
 
 </cfcomponent>

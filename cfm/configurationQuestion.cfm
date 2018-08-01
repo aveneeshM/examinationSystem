@@ -41,25 +41,25 @@
 	  <div class="label left">
 		  <span>1<sup>st</sup> Option:&nbsp;</span>
 	  </div><textarea rows="1" cols="50" id="option1"></textarea>
-	   <span class="checkBox"><label><input type="checkbox" name="optionSelector[]" id="ad_Checkbox1" value="1">Correct</label></span>
+	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox1" value="1">Correct</label></span>
 	</div><br>
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>2<sup>nd</sup> Option:&nbsp;</span>
 	  </div><textarea rows="1" cols="50" id="option2"></textarea>
-	   <span class="checkBox"><label><input type="checkbox" name="optionSelector[]" id="ad_Checkbox2" value="2">Correct</label></span>
+	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox2" value="2">Correct</label></span>
 	</div><br>
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>3<sup>rd</sup> Option:&nbsp;</span>
 	  </div><textarea rows="1" cols="50" id="option3"></textarea>
-	   <span class="checkBox"><label><input type="checkbox" name="optionSelector[]" id="ad_Checkbox3" value="3">Correct</label></span>
+	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox3" value="3">Correct</label></span>
 	</div><br>
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>4<sup>th</sup> Option:&nbsp;</span>
 	  </div><textarea rows="1" cols="50" id="option4"></textarea>
-	   <span class="checkBox"><label><input type="checkbox" name="optionSelector[]" id="ad_Checkbox4" value="4">Correct</label></span>
+	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox4" value="4">Correct</label></span>
 	</div><br><br><br>
 <br>
 	<div class="tableRow">

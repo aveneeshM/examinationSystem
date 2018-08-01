@@ -82,6 +82,7 @@ body {
 	padding: 10px 5px;
 	margin: 10px 5px;
 }
+
 #msform .a:hover, #msform .a:focus {
 	box-shadow: 0 0 0 2px white, 0 0 0 3px gray;
 }
@@ -368,4 +369,13 @@ box-shadow: 0 0 0 2px white, 0 0 0 3px #D84815;
 	margin-top: 2.5vw;
 	padding: 40px 0px 0px 60px;
 	height:18vw;
+}
+.buttons-pdf{
+    border: 2px solid #d84815;
+    padding: 4px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 18px;
+    cursor: pointer;
+	
 }

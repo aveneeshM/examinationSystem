@@ -1,6 +1,4 @@
-
-//insert into tests values('test1', '2008-11-11', 2, 25, 9, '2008-11-11', '08:00:00')
-//$("#yourdropdownid option:selected").text();
+//global variable declaration
 var arrayTime,allTime;
 $(document).ready(function () {
     $("#button").on("click", function () {
@@ -13,10 +11,13 @@ $(document).ready(function () {
         	addTest();
         }
     });
+    $("#timePicker").on("change", function(){
+		validateTime($("#timePicker").val());
+	})
     
 	$("#duration").on("change", function(){
 		$('#datetext').val("");
-		$('#timePicker').html("");
+		$("#timePicker").prop("selectedIndex", -1);
 	})
 	
 	$("#duration").on("blur", function (e) {
@@ -64,8 +65,49 @@ $(document).ready(function () {
             $("#timePicker").append(option).prop("selectedIndex", -1);
         	$('#timePicker').prop('disabled', false);
         }
-        console.log(arrayTime);
      });
+	
+	/*
+	$('#quesSubmit').click(function(e) {
+		var checked = [];
+        $(':checkbox:checked').each(function(i){
+      	  checked[i]=$(this).val();
+        
+      });
+		console.log(checked);
+		$.ajax({
+			 url:"../cfc/configExam.cfc",
+			 data: {
+				 method : "addQuestionTest",
+				 questionIDs : checked.join(),
+				 testID : $('#testName').val()
+			},
+			type:"POST",
+			success: function(data){
+			if(data == "false"){
+				console.log(data);
+				alert("Question selection for exam failed");
+				return false;
+	        }
+			else{
+				console.log(data);
+				$('#myModal').modal('hide');
+				$("#testQuesForm")[0].reset();
+				
+	        }
+
+			},
+			error: function(){
+				alert("AJAX error");
+				return false;
+			}
+		}); 
+		
+	})*/
+	
+	
+	
+	
     
 });
 
@@ -135,7 +177,6 @@ function timeCheck() {
 		type:"POST",
 		async:false,
 		success: function(data){
-			console.log(data);
 			returnTime=data;
 		},
 		error: function(e){
@@ -154,21 +195,24 @@ function timeCheck() {
 	return returnTime;
 
 }
-/*
-function validateTime(){
-	if( $("#timePicker option:selected").text().length >0){
-	var selectedTime= $("#timePicker option:selected").text();
-	var duration =$("#duration").val();
-	          if(allTime[allTime.indexOf((allTime.indexOf(selectedTime)+ duration)%(allTime.length+1))] != 
-	        	  arrayTime[arrayTime.indexOf((arrayTime.indexOf(selectedTime)+ duration)%(arrayTime.length+1))]){
-	        	  alert("Time slot clashing with another test. Choose a different time slot ");
-	        	  $("#timePicker").append(option).prop("selectedIndex", -1);
-	        	
-	        	  
-	            		}
-	            	}
+//not working
+function validateTime(selectedTime){
+var duration =$("#duration").val();
+var index=(allTime.indexOf(selectedTime)+(duration-1))%allTime.length;
+console.log($.inArray(arrayTime, allTime[index]));
+console.log(arrayTime);
+
+
+   if(arrayTime.includes(allTime[index])){
+	    return true;
+     }
+   else{
+	   alert("Time slot clashing with another test. Choose a different time slot ");
+	     $("#timePicker").prop("selectedIndex", -1);
+     }
+
 }
-*/
+
 function timeString(string, character, n){
     var count= 0, i=0,temp="";
     while(count<n && (i=string.indexOf(character,i)+1)){
@@ -201,7 +245,27 @@ function addTest() {
 		success: function(data){
 			console.log(data);
             alert("exam added");
+   /* -----------get ques.add modal to show questons.then save questions based on test name
+            
+            $.ajax({
+   			 url:"../cfc/configExam.cfc",
+   			 data: {
+   				 method : "testQuestion",
+   			},
+   			type:"POST",
+   			async:false,
+   			success: function(data){
+   			console.log(data);
+   		    displayQuestion(data);
+   			},
+   			error: function(){
+   				alert("AJAX error");
+   				return false;
+   			}
+   		}); */
+
             $("#addQuesForm")[0].reset();
+            
 		},
 		error: function(){
 			alert("AJAX error");
@@ -226,6 +290,24 @@ function validateNumber(number) {
         }
     
 }
+/*
+function displayQuestion(data){
+	
+	   var question = $.parseJSON(data);
+	   $("#questionSelectTable > tbody").html("");
+	    for(var i=0; i<question.length;i++){
+	    	var markup = '<tr><td align="center">' + question[i][1] + 
+	    	'</td><td align="center"><input type="checkbox" name="questionSelector[]" value='+
+	    	question[i][0]+'></td></tr>';
+	    	$("#questionSelectTable tbody").append(markup);
+	    	$('#myModal').modal('show'); 
+	    }
+	    $('#testID').val(question[1][2]);
+	    
+	}
+
+*/
+
 String.prototype.replaceAt=function(index, replacement) {
     return this.substr(0, index) + replacement+ this.substr(index + replacement.length);
 }

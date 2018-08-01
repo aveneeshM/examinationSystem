@@ -3,16 +3,19 @@ var tests;
 var currentTestID;
 var currentTestRowCount;
 var currentTestRow;
+var testStartTime;
 
 
 $(document).ready(function () {	
-	$('#examDisplayTable').DataTable({
+	/*$('#examDisplayTable').DataTable({
 		info:false,
 		searching: false,
 		ordering:false,
-		paging:true
+		paging:false,
+		scrollY:"480px",
+		scrollCollapse: true
 	});
-	
+	*/
 	/*
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
@@ -30,7 +33,7 @@ $(document).ready(function () {
 			return false;
 		}
 	});       */
-//get list of upcoming tests
+//get list of selected tests
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
@@ -40,22 +43,26 @@ $(document).ready(function () {
 		type:"POST",
 		success: function(data){
 	    displayTests(data);
+	    $('#examDisplayTable').DataTable();
 		},
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
-//start test button response 	 
+	 
+	 
+//start test button response.button value is test id 	 
 	 $(".modalOpener").on("click", function(e){
-//get selected test ID
 	        e.preventDefault();
 //Function call to start exam
 	        displayExam($(this).val());
-	     
 	    });
+	 
+	 
 //next question button response
 	 $("#examNext").on("click", function(e){
+		 validateOngoingTest();
 //disable next button for last question
 		 if(currentTestRow == currentTestRowCount-1){
 				$('#examNext').prop('disabled', true);
@@ -63,7 +70,7 @@ $(document).ready(function () {
 //store user's response for the question
 		 var questionID = $("#questionID").val();
 		 var checked = [];
-	        $(':checkbox:checked').each(function(i){
+	        $(':radio:checked').each(function(i){
 	      	  checked[i]=$(this).val();
 	        });
 		 currentTestRow+=1;
@@ -73,9 +80,11 @@ $(document).ready(function () {
 	 });
 	 
 	 $("#examSubmit").on("click", function(e){
+		 validateOngoingTest();
+
 		 var questionID = $("#questionID").val();
 		 var checked = [];
-	        $(':checkbox:checked').each(function(i){
+	        $(':radio:checked').each(function(i){
 	      	  checked[i]=$(this).val();
 	        });
 	        saveResult(questionID,checked.join());
@@ -103,8 +112,24 @@ function displayTests(data){
     	var markup = '<tr id="'+tests[i][0]+'"><td align="center">'+ tests[i][1]+
     	'</td><td align="center">'+ tests[i][3]+
     	'</td><td align="center">'+tests[i][4]+
-    	'</td><td align="center"><button class= "modalOpener" value='+
-    	tests[i][0] +'>Start</button></td></tr>';
+    	'</td>';
+    	var postMarkup = '';
+    	if(tests[i][5] == ''){
+    		postMarkup = '<td align="center"><button class= "modalOpener" value='+
+        	tests[i][0] +'>Start</button></td></tr>';
+    		
+    	}
+    	else{
+    		postMarkup ='<td align="center"><b>'+ 
+        	tests[i][5]*100 +'%</b></td></tr>';
+    	}
+    	markup = markup+postMarkup;
+    	
+    	
+    	
+    	
+    	
+    	
     	//'</td><td align="center"><input type="checkbox" name="optionSelector[]" value='+
     	//tests[i][0] +' '+check+' ></td></tr>';
        	$("#examDisplayTable tbody").append(markup);
@@ -113,6 +138,54 @@ function displayTests(data){
     
     
 }
+
+
+function validateOngoingTest(){
+	 $.ajax({
+		 url:"../cfc/studentHome.cfc",
+		 data: {
+			 method : "validateOngoingTest",
+			 testID : currentTestID
+		},
+		async:false,
+		type:"POST",
+		success: function(data){
+		console.log(data);
+		if(data == "true"){
+			return true;
+		}
+		else{
+			$('#myModal').modal('hide');
+			alert("Test session expired. Your response has been submitted");
+			location.reload();
+		}
+		},
+		error: function(){
+			alert("AJAX error");
+			return false;
+		}
+	});
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -138,7 +211,9 @@ function displayExam(ID){
 				alert("Test can only be started at mentioned Time");
 			}
 			else{
-				currentTestRowCount = $.parseJSON(data);
+				var recievedData =  $.parseJSON(data);	//////////////////////////////console.log here and check time format		
+				currentTestRowCount = recievedData[0];  ////////////change submit function at timer
+				testStartTime = recievedData[1];
 // error message if there is no question in the selected test
 				if(currentTestRowCount == 0){
 					alert("Test is presently unavailable!!")
@@ -189,10 +264,10 @@ function createTest(){
 	});
     	var markup = '<fieldset class="testFieldset"><input type="hidden" id="questionID" value="'
     	+questionRow[0]+'"><p><i><b>'+questionRow[1]+
-    	'</b></i></p><hr><br><input type="checkbox" name="options[]" checked value = 1>'+questionRow[2]+
-    	'<br><input type="checkbox" name="options[]" value = 2>'+questionRow[3]+
-    	'<br><input type="checkbox" name="options[]" value = 3>'+questionRow[4]+
-    	'<br><input type="checkbox" name="options[]" value = 4>'+questionRow[5]+
+    	'</b></i></p><hr><br><input type="radio" name="options" value = 1>'+questionRow[2]+
+    	'<br><input type="radio" name="options" value = 2>'+questionRow[3]+
+    	'<br><input type="radio" name="options" value = 3>'+questionRow[4]+
+    	'<br><input type="radio" name="options" value = 4>'+questionRow[5]+
     	'<br></fieldset>';
     	$("#onlineTestForm").append(markup);
 	    $('#myModal').modal('show');
@@ -229,6 +304,7 @@ function finalResult(){
 		 url:"../cfc/studentHome.cfc",
 		 data: {
 			 method : "finalResult", 
+			 testID : currentTestID
 		},
 		type:"POST",
 		success: function(data){
@@ -240,9 +316,7 @@ function finalResult(){
 		}
 		correct = $.parseJSON(data);
 		alert("your score : "+ correct + "/"+currentTestRowCount+"\n"+
-				"percentage :" + Math.round(correct/currentTestRowCount).toFixed(2)*100.00+"%" );
-
-		
+				"percentage :" + ((correct/currentTestRowCount)*100).toFixed(2) + "%" );
 		},
 		error: function(){
 			alert("AJAX error");
@@ -273,18 +347,18 @@ function duration(){
 function timer(n){
 	
 	// Set the time we're counting down to
-	var countDownDate =  new Date();
-	    countDownDate.setHours(countDownDate.getHours() +n);
-	    console.log(countDownDate);
+	var countDownTime =  new Date(testStartTime);
+	    countDownTime.setHours(countDownTime.getHours() +n);
+	    console.log(countDownTime);
 
 	// Update the count down every 1 second
-	setInterval(function() {
+	var x = setInterval(function() {
 
 	    // Get present date and time
 	    var now = new Date().getTime();
 	    
 	    // Find the distance between now and the count down date
-	    var distance = countDownDate - now;
+	    var distance = countDownTime - now;
 	    
 	    // Time calculations for hours, minutes and seconds
 	    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

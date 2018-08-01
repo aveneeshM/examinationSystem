@@ -2,17 +2,11 @@
 <cfif NOT isUserLoggedIn()>
 <cflocation url="login.cfm" addtoken="no">
 </cfif>
-<cfif structKeyExists(session,"testData")>
-<cfset saveDeleteObj = CreateObject("Component", "examinationSystem.cfc.studentHome") />
-<cfset saveDeleteObj.submitStopTest() />
-	<cfabort showError = "Test interrupted. reload">
-
-</cfif>
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="../assets/script/logout.js"> </script>
-<script src="../assets/script/studentHome.js"> </script>
+<script src="../assets/script/studentViewExam.js"> </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
 <link rel="stylesheet" href="../assets/css/style.css" media="screen" type="text/css" />
 <link rel="stylesheet" href="../assets/css/loggedInStyle.css" media="screen" type="text/css" />
@@ -37,8 +31,9 @@
 		<div id="logoutButton"><img src="../assets/images/logout.png" alt="Logout" width="25" height="25" border="0" id="logOutButton"></div>
 					<div class="headernav">
                 <ul>
-                <li><a href="studentViewExam.cfm">Upcoming Tests</a></li>
-	            <li><a id="activepage" href="#about">Dashboard</a></li>
+	            <li><a id="activepage" href="#about">Upcoming Tests</a></li>
+                <li><a href="studentHome.cfm">Dashboard</a></li>
+
                 </ul>
 			</div>
 
@@ -65,26 +60,6 @@
           </table>
 		</form>
 	</div>
-<!---Test Modal--->
-	<div class="modal hide fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" >Test Window&nbsp;<span id="timer"></span></h4>
-        </div>
-        <div class="modal-body">
-			<form class="onlineTestForm" id="onlineTestForm" method="POST">
-			</form>
-
-        </div>
-        <div class="modal-footer">
-			<button type="button" class="btn btn-default left" id="examNext">Next Question</button>
-			<button type="button" class="btn btn-default" id="examSubmit">Submit Test</button>
-        </div>
-      </div>
-  </div>
-</div>
 </body>
 </html>

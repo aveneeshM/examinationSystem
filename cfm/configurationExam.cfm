@@ -11,7 +11,10 @@
 <link rel="stylesheet" href="../assets/css/loggedInStyle.css" media="screen" type="text/css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css">
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 
 </head>
 <body>
@@ -60,6 +63,36 @@
 </div><br>
 <input type="button" name="button" id="button" class="login login-submit right addQuestionButton" value="Add Test">
   </form>
+<!---Modal to add questions to the created test--->
+	<div class="modal hide fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Select Questions</h4>
+        </div>
+        <div class="modal-body">
+			<form class="testQuesForm" id="testQuesForm" method="POST">
+				<input type="hidden" id="testID">
+			<table id="questionSelectTable" class="display">
+				<thead>
+					<tr>
+						<th>Question</th>
+						<th>Add to Test</th>
+                    </tr>
+               </thead>
+               <tbody>
+			</tbody>
+          </table>
+		</form>
+        </div>
+        <div class="modal-footer">
+			<button type="button" class="btn btn-default left" id="quesSubmit">Add</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+  </div>
 
 </body>
 </html>
