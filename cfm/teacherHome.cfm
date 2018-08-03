@@ -51,13 +51,14 @@
 <div class="questionList">
 <cfset teacherObj = CreateObject("Component", "examinationSystem.cfc.teacherHome") />
 <cfset teacherObjQuestion = teacherObj.questionAll() />
+<!---Check to see if question table has atleast one entry--->
 	<cfif #teacherObj.questionExists()#>
 		<h3>Questions</h3><br>
 			<!---Question display table--->
 		<table id="questionSelectTable" class="display">
 				<thead>
 					<tr>
-						<th class="hiddenColumn"></th>
+						<th class="hiddenColumn">Status</th>
 						<th>ID</th>
                         <th>Question</th>
 						<th>Level</th>
@@ -75,8 +76,13 @@
 					<cfelse>
 					<tr class="red inactive">
 					</cfif>
-					<td class="hiddenColumn"><cfoutput>#isActive#</cfoutput></td>
-					<td class="questionID"><cfoutput>OES#questionID#</cfoutput></td>
+					<td class="hiddenColumn">
+						<cfif #isActive# EQ 0>
+						<cfoutput>Inactive</cfoutput></td>
+						<cfelse>
+						<cfoutput>Active</cfoutput></td>
+						</cfif>
+					<td class="questionID"><cfoutput>#questionID#</cfoutput></td>
                     <td><cfoutput>#questionDescription#</cfoutput></td>
 					<td><cfoutput>#difficultyLevel#</cfoutput></td>
                     <td><cfoutput>#option1#</cfoutput></td>

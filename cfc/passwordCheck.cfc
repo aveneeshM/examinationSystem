@@ -6,6 +6,8 @@
   --- date:   7/24/18
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
+
+<!---Function to check if entered password is correct --->
 <cffunction name="passwordChecker" access="remote" returntype="string" returnformat="json">
 	<cfargument name="password" type="string" required="true" >
 	<cfargument name="email" type="string" required="true" >
@@ -13,11 +15,10 @@
 	    <cfset passwordHash = passwordObj.hashPassword(arguments.password) />
 	    <cftry>
 	<cfquery name="passwordCheckQuery" datasource="examinationSystem">
-          select password from loginDetails where emailID=<cfqueryparam value="#arguments.email#" cfsqltype="cf_sql_varchar" />
+          SELECT password FROM loginDetails WHERE emailID=<cfqueryparam value="#arguments.email#" cfsqltype="cf_sql_varchar" />
 	</cfquery>
 		 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --

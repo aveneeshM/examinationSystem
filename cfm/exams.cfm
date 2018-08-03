@@ -63,7 +63,7 @@
 					<tr>
 
 					<td class="hiddenColumn"></td>
-					<td class="examID"><cfoutput>OEST#testID#</cfoutput></td>
+					<td class="examID"><cfoutput>#testID#</cfoutput></td>
                     <td><cfoutput>#name#</cfoutput></td>
 					<td><cfoutput>#dateformat(startDate,"dd-mm-yyyy")#</cfoutput></td>
 					<td><cfoutput>#duration#</cfoutput></td>

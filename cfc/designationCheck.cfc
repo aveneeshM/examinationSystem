@@ -35,6 +35,7 @@
 </cffunction>
 <cffunction name="doLogOut" access="remote" returntype="void" output="false">
     <cfset structdelete(session,'stLoggedInUser')/>
+	<cfset structdelete(session,'testData')/>
 	<cflogout />
 </cffunction>
 

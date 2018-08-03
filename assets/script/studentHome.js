@@ -3,36 +3,9 @@ var tests;
 var currentTestID;
 var currentTestRowCount;
 var currentTestRow;
-var testStartTime;
-
 
 $(document).ready(function () {	
-	/*$('#examDisplayTable').DataTable({
-		info:false,
-		searching: false,
-		ordering:false,
-		paging:false,
-		scrollY:"480px",
-		scrollCollapse: true
-	});
-	*/
-	/*
-	 $.ajax({
-		 url:"../cfc/studentHome.cfc",
-		 data: {
-			 method : "getTestStudent"
-		},
-		async:false,
-		type:"POST",
-		success: function(data){
-	    testID = $.parseJSON(data);
-	    console.log(testID);
-		},
-		error: function(){
-			alert("AJAX error");
-			return false;
-		}
-	});       */
+	
 //get list of selected tests
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
@@ -43,7 +16,9 @@ $(document).ready(function () {
 		type:"POST",
 		success: function(data){
 	    displayTests(data);
-	    $('#examDisplayTable').DataTable();
+	    $('#examDisplayTable').DataTable( {
+	    		"aaSorting": [[1,'desc'],[2,'desc']]
+	    } );
 		},
 		error: function(){
 			alert("AJAX error");
@@ -52,8 +27,9 @@ $(document).ready(function () {
 	});
 	 
 	 
-//start test button response.button value is test id 	 
-	 $(".modalOpener").on("click", function(e){
+//start test button response.button value is test id 
+	 $('#examDisplayTable').on('click', '.modalOpener', function(e){
+	 //$(".modalOpener").on("click", function(e){
 	        e.preventDefault();
 //Function call to start exam
 	        displayExam($(this).val());
@@ -67,6 +43,10 @@ $(document).ready(function () {
 		 if(currentTestRow == currentTestRowCount-1){
 				$('#examNext').prop('disabled', true);
 		 }
+//enable previous button after test start
+		 if(currentTestRow == 1){
+				$('#examPrevious').prop('disabled', false);
+		 }
 //store user's response for the question
 		 var questionID = $("#questionID").val();
 		 var checked = [];
@@ -74,6 +54,31 @@ $(document).ready(function () {
 	      	  checked[i]=$(this).val();
 	        });
 		 currentTestRow+=1;
+		 saveResult(questionID,checked.join());
+//function call to display next question
+		 createTest();
+	 });
+	 
+
+	 
+//previous question button response
+	 $("#examPrevious").on("click", function(e){
+		 validateOngoingTest();
+//disable previous button for first question 
+		 if(currentTestRow == 2){
+				$('#examPrevious').prop('disabled', true);
+		 }
+//enable next button when browsing back from last question
+		 if(currentTestRow == currentTestRowCount){
+				$('#examNext').prop('disabled', false);
+		 }
+//store user's response for the question
+		 var questionID = $("#questionID").val();
+		 var checked = [];
+	        $(':radio:checked').each(function(i){
+	      	  checked[i]=$(this).val();
+	        });
+		 currentTestRow-=1;
 		 saveResult(questionID,checked.join());
 //function call to display next question
 		 createTest();
@@ -171,25 +176,6 @@ function validateOngoingTest(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //function to start test
 function displayExam(ID){
     $("#onlineTestForm").html("");
@@ -211,15 +197,15 @@ function displayExam(ID){
 				alert("Test can only be started at mentioned Time");
 			}
 			else{
-				var recievedData =  $.parseJSON(data);	//////////////////////////////console.log here and check time format		
-				currentTestRowCount = recievedData[0];  ////////////change submit function at timer
-				testStartTime = recievedData[1];
+				var recievedData =  $.parseJSON(data);	
+				currentTestRowCount = recievedData;
 // error message if there is no question in the selected test
 				if(currentTestRowCount == 0){
-					alert("Test is presently unavailable!!")
+					alert("Test is presently unavailable!!");
 				}
 				else{
 					$('#examNext').prop('disabled', false);
+					$('#examPrevious').prop('disabled', true);
 					currentTestRow=1;
 //start test
 					setTimeout(function(){
@@ -241,6 +227,7 @@ function displayExam(ID){
 
 //function to display test modal
 function createTest(){
+	var markup;
 	$("#onlineTestForm").html("");
 	var questionRow;
 	 $.ajax({
@@ -254,15 +241,16 @@ function createTest(){
 		async:false,
 		type:"POST",
 		success: function(data){
-		console.log(data);
+		
 		questionRow = $.parseJSON(data);
+		console.log(questionRow);
 		},
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
-    	var markup = '<fieldset class="testFieldset"><input type="hidden" id="questionID" value="'
+    	markup = '<fieldset class="testFieldset"><input type="hidden" id="questionID" value="'
     	+questionRow[0]+'"><p><i><b>'+questionRow[1]+
     	'</b></i></p><hr><br><input type="radio" name="options" value = 1>'+questionRow[2]+
     	'<br><input type="radio" name="options" value = 2>'+questionRow[3]+
@@ -270,6 +258,11 @@ function createTest(){
     	'<br><input type="radio" name="options" value = 4>'+questionRow[5]+
     	'<br></fieldset>';
     	$("#onlineTestForm").append(markup);
+    	if(questionRow[6] > 0){
+    	$("input[name=options][value=" + questionRow[6] + "]").prop('checked', true);
+    	}
+    	
+    	
 	    $('#myModal').modal('show');
  
 }
@@ -346,19 +339,25 @@ function duration(){
 }
 function timer(n){
 	
+	var dayNow = new Date();
+    var minutes = dayNow.getMinutes();
+    n= (n*60*60*1000)- (minutes*60*1000);
+    var count =0;
+	
 	// Set the time we're counting down to
-	var countDownTime =  new Date(testStartTime);
-	    countDownTime.setHours(countDownTime.getHours() +n);
-	    console.log(countDownTime);
+	//var countDownTime =  new Date(testStartTime);
+	    //countDownTime.setHours(countDownTime.getHours() +n);
+	   // console.log(countDownTime);
 
 	// Update the count down every 1 second
 	var x = setInterval(function() {
 
 	    // Get present date and time
-	    var now = new Date().getTime();
+	    //var now = new Date().getTime();
 	    
 	    // Find the distance between now and the count down date
-	    var distance = countDownTime - now;
+	    var distance =n - count;
+	    count = count+1000;
 	    
 	    // Time calculations for hours, minutes and seconds
 	    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -370,12 +369,19 @@ function timer(n){
 	    	    + minutes + "m " + seconds + "s ");
 	    
 	    // If the count down is over, write some text 
-	    if (distance < 0) {
+	    if (distance == 0) {
 	        clearInterval(x);
 	        $("#timer").html("EXPIRED");
-	        saveResult(questionID,checked.join());
-	        $('#myModal').modal('hide');
-	        finalResult();
+	        var questionID = $("#questionID").val();
+			 var checked = [];
+		        $(':radio:checked').each(function(i){
+		      	  checked[i]=$(this).val();
+		        });
+		        saveResult(questionID,checked.join());
+	//close modal after submit
+		        $('#myModal').modal('hide');
+	//generate calculated result
+		        finalResult();
 	        
 	    }
 	}, 1000);

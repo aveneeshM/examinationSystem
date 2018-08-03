@@ -6,15 +6,14 @@
   --- date:   7/29/18
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
-
+<!---Function to check if atleast one question exists in the database--->
 	<cffunction name="questionExists" access="public" returntype="string" returnformat="JSON">
 		<cftry>
 		<cfquery name="questionExistsQuery" datasource="examinationSystem">
-          select top 1 questionID from questions
+          SELECT TOP 1 questionID FROM questions
 	    </cfquery>
 	    	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -25,16 +24,16 @@
 	    <cfreturn #questionExistsQuery.recordcount#>
 	</cffunction>
 
+<!---Function to return all questions --->
 	<cffunction name="questionAll" access="public">
 		<cftry>
 	    <cfquery name="questionAllQuery" datasource="examinationSystem">
-          select questionID,questionDescription,difficultyLevel,option1,
-		  option2,option3,option4,isCorrect,isActive from questions
-		  order by createdDate desc
+          SELECT questionID,questionDescription,difficultyLevel,option1,
+		  option2,option3,option4,isCorrect,isActive FROM questions
+		  ORDER BY createdDate DESC
 	    </cfquery>
 	    	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -45,16 +44,16 @@
         <cfreturn #questionAllQuery#>
 	</cffunction>
 
+<!---Function to return all questions --->
 	<cffunction name="getQuestion" access="remote" returnformat="JSON">
 	    <cfargument name="questionID" type="string" required="true" >
 	    <cftry>
 		<cfquery name="getQuestionQuery" datasource="examinationSystem">
-		  select questionDescription, questionID, option1,option2,option3,option4,isCorrect from questions where questionID
-		  = <cfqueryparam value="#arguments.questionID#" cfsqltype="cf_sql_integer" /> order by createdDate desc
+		  SELECT questionDescription, questionID, option1,option2,option3,option4,isCorrect FROM questions WHERE questionID
+		  = <cfqueryparam value="#arguments.questionID#" cfsqltype="cf_sql_integer" /> ORDER BY createdDate DESC
 	    </cfquery>
 	    	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -69,7 +68,7 @@
 		<cfreturn questionArr>
 	</cffunction>
 
-
+<!---Function to save edited changes --->
 	<cffunction name="editQuestion" access="remote" returntype="string" returnformat="JSON">
 	  <cfargument name="questionID" type="string" required="true" >
 	  <cfargument name="options" type="string" required="true" >
@@ -81,7 +80,6 @@
 	  </cfquery>
 	  	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --

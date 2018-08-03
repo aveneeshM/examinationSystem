@@ -16,13 +16,23 @@
 <!---selects all future tests available--->
 		<cffunction name="getTest" access="remote" returnformat="JSON">
 
+			<cftry>
 		    <cfquery name="testAllQuery" datasource="examinationSystem">
-		      select testID,name,duration,startDate,startTime from tests
-		      where startDate >= CONVERT(char(10), GetDate(),126) and
-		      testID not in(select testID from testStudent where
+		      SELECT testID,name,duration,startDate,startTime FROM tests
+		      WHERE startDate >= CONVERT(char(10), GetDate(),126) AND
+		      testID not in(select testID FROM testStudent WHERE
 		      testTakerID = <cfqueryparam cfsqltype = "CF_SQL_INTEGER" value = "#session.stLoggedInUser.userID#" />)
-		      order by startDate, startTime desc
+		      ORDER BY startDate, startTime DESC
 		   </cfquery>
+		   <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+					  Message: #message#" />
+		  </cfcatch>
+		  </cftry>
 
 
 		   <cfset testArray = arraynew(1)>
@@ -34,7 +44,7 @@
 		   <cfreturn testArray>
 	   </cffunction>
 
-
+<!---Add selected test to testStudent table--->
 	   <cffunction name="addTest" access="remote" returnformat="JSON">
 		   <cfargument name="testID" type="numeric" required="true">
 			<cftry>
@@ -51,7 +61,6 @@
 		   </cfquery>
 		   	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --

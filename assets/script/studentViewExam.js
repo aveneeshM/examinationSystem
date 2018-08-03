@@ -1,17 +1,4 @@
-//global variable declaration
-
-
-
 $(document).ready(function () {	
-	$('#examDisplayTable').DataTable({
-		info:false,
-		searching: false,
-		ordering:false,
-		paging:false,
-		scrollY:"480px",
-		scrollCollapse: true
-	});
-	
 
 //get list of upcoming tests
 	 $.ajax({
@@ -23,6 +10,12 @@ $(document).ready(function () {
 		type:"POST",
 		success: function(data){
 	    displayTests(data);
+	    $('#examDisplayTable').DataTable( {
+	    	paging:false,
+	    	scrollY:"480px",
+			scrollCollapse: true,
+	    	"aaSorting": [[1,'asc'], [2,'asc']]
+	    } );
 		},
 		error: function(){
 			alert("AJAX error");
@@ -31,9 +24,8 @@ $(document).ready(function () {
 	});
 //start test button response 	 
 	 $(".selectTest").on("click", function(e){
-//get selected test ID
 	        e.preventDefault();
-//Function call to start exam
+//Function call with testID as argument to start exam
 	        addExam($(this).val());
 	     
 	    });
@@ -54,16 +46,12 @@ function displayTests(data){
     	'</td><td align="center">'+tests[i][4]+
     	'</td><td align="center"><button class= "selectTest" value='+
     	tests[i][0] +'>Add Test</button></td></tr>';
-    	//'</td><td align="center"><input type="checkbox" name="optionSelector[]" value='+
-    	//tests[i][0] +' '+check+' ></td></tr>';
        	$("#examDisplayTable tbody").append(markup);
     	
     } 
     
     
 }
-
-
 
 
 

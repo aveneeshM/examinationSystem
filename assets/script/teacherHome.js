@@ -1,8 +1,7 @@
 $(document).ready(function () {
 	$('#questionSelectTable').DataTable({
-
-		info:false,
-		ordering:false,
+		title: 'Examination Questions',
+		"aaSorting": [1,'desc'],
 //allign elements at centre
 		"columnDefs": [
 	        {"className": "dt-center", "targets": "_all"}
@@ -11,19 +10,24 @@ $(document).ready(function () {
 	        buttons: [
 	            {
 	                extend: 'pdf',
-	                orientation: 'landscape',
+	                title: 'Examination Questions',
+	                customize: function(doc) {
+	                    doc.styles.title = {
+	                      fontSize: '30',
+	                      alignment: 'center'
+	                    };     
+	                  },
 	                pageSize: 'LEGAL',
 	                exportOptions: {
-	                    columns: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
-	                },
+	                }
 	            }
 	        ],
 	        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-                if ( aData[0] == "0" )
+                if ( aData[0] == "Inactive" )
                 {
                     $('td', nRow).css('background-color', 'pink');
                 }
-                else if ( aData[0] == "1" )
+                else if ( aData[0] == "Active" )
                 {
                     $('td', nRow).css('background-color', 'lightgreen');
                 }
@@ -31,37 +35,35 @@ $(document).ready(function () {
             
 
 	});
+	
+	//dataTable for edit option modal
 	$('#optionSelectTable').DataTable({
 		info:false,
 		searching: false,
 		ordering:false,
 		paging:false
 	});
-
+	
+	//select active/inactive/all questions
 	$('input[type="checkbox"]').on('change', function() {
 		   $(this).siblings('input[type="checkbox"]').prop('checked', false);
 		   if($(this).val()=="all"){
 			   $(".active").show();
-			   $(".inactive").show();
-			  // $('#questionSelectTable').DataTable().ajax.reload();
-			   
+			   $(".inactive").show();			   
 		   }
 		   else if($(this).val()=="active"){
 			   $(".active").show();
-			   $(".inactive").hide();
-			   //$('#questionSelectTable').DataTable().ajax.reload();
-			   
+			   $(".inactive").hide();		   
 		   }
 		   else{
 			   $(".active").hide();
 			   $(".inactive").show();
-			   //$('#questionSelectTable').DataTable().ajax.reload();
 		   }
-		   
 		});
+	
+	//table row on click will will extract selected question options and call function to open editing modal 
 	$("#questionSelectTable tbody").on('click', 'tr', function () {
 	    var extractedID = $(this).find(".questionID").text();
-	    extractedID = extractedID.substr(3);
 	    $.ajax({
 			 url:"../cfc/teacherHome.cfc",
 			 data: {
@@ -84,7 +86,7 @@ $(document).ready(function () {
 	
 	
 	
-	
+	//Response to Save Edit button
 	$('#optionSubmit').click(function(e) {
 		var checked = [];
         $('#optionSelectTable :radio:checked').each(function(i){
@@ -100,6 +102,7 @@ $(document).ready(function () {
 				 questionID : $('#getQuesID').val()
 			},
 			type:"POST",
+			
 			success: function(data){
 			if(data == "false"){
 				console.log(data);
@@ -109,7 +112,7 @@ $(document).ready(function () {
 			else{
 				console.log(data);
 				
-				$('#myModal').modal('hide').delay(400);
+				$('#myModal').modal('hide');
 				location.reload(true);
 				//$("#testQuesForm")[0].reset();
 				
@@ -122,18 +125,11 @@ $(document).ready(function () {
 			}
 		}); 
 		
-	})
-	
-
-	
-
-
-		
-	
+	})	
 });
 
 
-
+// function to display edit question modal
 function displayQuestion(data){
 	
     var question = $.parseJSON(data),check,tempID;

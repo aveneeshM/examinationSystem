@@ -50,7 +50,7 @@
 
 
 	<cffunction name="testQuestion" access="remote" returnformat="JSON">
-	<cfargument name="testID" type="string" required="true" >
+	<cfargument name="testID" type="numeric" required="true" >
 	<cftry>
 		<cfquery name="questionAllQuery" datasource="examinationSystem">
 		select Q.questionDescription, Q.questionID from questions Q where Q.questionID
@@ -58,8 +58,9 @@
 		 testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />)
 		 order by Q.questionID desc
 		 </cfquery>
-		 	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
+
+ 		 	 <cfcatch type = "any">
+		<cfset type="#cfcatch.Type#" />
 			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"

@@ -5,7 +5,8 @@
 <cfif structKeyExists(session,"testData")>
 <cfset saveDeleteObj = CreateObject("Component", "examinationSystem.cfc.studentHome") />
 <cfset saveDeleteObj.submitStopTest() />
-	<cfabort showError = "Test interrupted. reload">
+<cflocation url="studentHome.cfm" addtoken="no">
+	<!--- <cfabort showError = "Test interrupted. reload"> --->
 
 </cfif>
 <html>
@@ -20,10 +21,8 @@
 <link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
-
-
-
 </head>
+
 <body>
 <!--header -->
 		<div id="header" >
@@ -80,7 +79,9 @@
 
         </div>
         <div class="modal-footer">
+			<button type="button" class="btn btn-default left" id="examPrevious">Previous Question</button>
 			<button type="button" class="btn btn-default left" id="examNext">Next Question</button>
+
 			<button type="button" class="btn btn-default" id="examSubmit">Submit Test</button>
         </div>
       </div>

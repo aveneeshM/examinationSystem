@@ -6,17 +6,16 @@
   --- date:   7/30/18
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
-<!---selects all future tests available--->
+<!---selects all marked tests available for  the student--->
 		<cffunction name="getTest" access="remote" returnformat="JSON">
 			<cftry>
 		    <cfquery name="testAllQuery" datasource="examinationSystem">
-		      select T.testID,T.name,T.duration,T.startDate,T.startTime,R.result from( tests T
-		      inner join testStudent R on T.testID = R.testID)
-		      order by T.startDate, T.startTime desc
+		      SELECT T.testID,T.name,T.duration,T.startDate,T.startTime,R.result FROM( tests T
+		      INNER JOIN testStudent R ON T.testID = R.testID)
+		      ORDER BY T.startDate, T.startTime DESC
 		   </cfquery>
 		   	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -26,9 +25,24 @@
 		</cftry>
 		   <cfset testArray = arraynew(1)>
 		   <cfloop query="testAllQuery">
+			   <cfset var testResult = testAllQuery.result>
+			   <cfif #testAllQuery.startDate# EQ #DATEFORMAT(NOW(),"yyyy-mm-dd")#>
+			   <cfset var checkTimeWindow= TIMEFORMAT(DateAdd("n",15,testAllQuery.startTime),"hh:mm:ss")>
+
+
+		      <cfif TIMEFORMAT(Now(),"hh:mm:ss") GT #checkTimeWindow#>
+			      <cfquery result="invalidTimeResultQuery" datasource="examinationSystem">
+		          UPDATE testStudent SET
+		          result = 0
+		          WHERE testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
+		          AND testID = <cfqueryparam value="#testAllQuery.testID#" cfsqltype="cf_sql_integer" />
+		         </cfquery>
+		         <cfset var testResult = 0>
+				</cfif>
+			  </cfif>
 		     <CFSET testArray[#currentRow#] =[testAllQuery.testID, testAllQuery.name,
 		     testAllQuery.duration, #DATEFORMAT(testAllQuery.startDate,"yyyy-mm-dd")#,
-		     #TIMEFORMAT(testAllQuery.startTime,"hh:mm:sstt")#,testAllQuery.result] />
+		     #TIMEFORMAT(testAllQuery.startTime,"hh:mm:sstt")#,testResult] />
 	       </cfloop>
 		   <cfreturn testArray>
 	   </cffunction>
@@ -39,8 +53,8 @@
 	   <cffunction name="getTestStudent" access="remote" returnformat="JSON">
 		   <cftry>
 		    <cfquery name="testStudentAllQuery" datasource="examinationSystem">
-		      select testID,testTakerID from testStudent
-		      where testTakerID=<cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
+		      SELECT testID,testTakerID FROM testStudent
+		      WHERE testTakerID=<cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
 		   </cfquery>
 		   	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
@@ -67,18 +81,17 @@
 		   <cftry>
 			   <!---Query for time and date validation at test start--->
 		   <cfquery name="testQuery" datasource="examinationSystem">
-		      select startDate,startTime,duration from tests
-		      where testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
+		      SELECT startDate,startTime,duration FROM tests
+		      WHERE testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
 		   </cfquery>
 		   <!---Returns number of questions in the test--->
 		   <cfquery name="rowCountQuery" datasource="examinationSystem">
-		      select questionID from testQuestions
-		      where testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
+		      SELECT questionID FROM testQuestions
+		      WHERE testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
 		   </cfquery>
 		   	 <cfcatch type = "any">
 
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -89,17 +102,21 @@
 
 		   <cfif #testQuery.startDate# EQ #DATEFORMAT(NOW(),"yyyy-mm-dd")#>
 
-		      <cfset checkTime= TIMEFORMAT(DateAdd("n",55,testQuery.startTime),"hh:mm:ss")>
+		      <cfset checkTime= TIMEFORMAT(DateAdd("n",59,testQuery.startTime),"HH:mm:ss")>
 
-		      <cfif TIMEFORMAT(Now(),"hh:mm:ss") LT #checkTime# AND
-		          TIMEFORMAT(Now(),"hh:mm:ss") GTE TIMEFORMAT(testQuery.startTime,"hh:mm:ss")>
+		      <cfif TIMEFORMAT(Now(),"HH:mm:ss") LT #checkTime# AND
+		          TIMEFORMAT(Now(),"HH:mm:ss") GTE TIMEFORMAT(testQuery.startTime,"HH:mm:ss")>
 
-			        <cfset Session.testData = {'endTestTime' =
-			        TIMEFORMAT(DateAdd("h",testQuery.duration,testQuery.startTime),"hh:mm:ss"),
-			         'correct' = 0, 'total' = rowCountQuery.recordCount, 'testID' = arguments.testID }>
-<!---return date time in a format that can be used as dateTime stamp--->
-			        <cfreturn [rowCountQuery.recordCount, testQuery.startDate+' '+testQuery.startTime]><!---Used to disable next question button at client side--->
+			          <cfif  rowCountQuery.recordCount NEQ 0>
 
+			            <cfset Session.testData = {'endTestTime' =
+			            TIMEFORMAT(DateAdd("h",testQuery.duration,testQuery.startTime),"HH:mm:ss"),
+			            'correct' = 0, 'total' = rowCountQuery.recordCount, 'testID' = arguments.testID,
+			            'testResponse' = structNew() }>
+			            <cfreturn rowCountQuery.recordCount><!---Used to disable next question button at client side--->
+			           <cfelse>
+			           <cfreturn "empty test">
+			         </cfif>
 
 
 		      <cfelse>
@@ -116,17 +133,35 @@
 	   <cffunction name="generateQuestion" access="remote" returnformat="JSON">
 		   <cfargument name="testID" required="true" >
 		   <cfargument name="row" required="true" >
+		   <cftry>
 	       <cfquery name="getTestQuestionQuery" datasource="examinationSystem">
 		      SELECT TOP 1 R.* FROM
-             (select top #arguments.row#
+             (SELECT TOP #arguments.row#
 			 Q.questionID, Q.questionDescription,Q.option1,Q.option2,
-             Q.option3,Q.option4 from (questions Q inner join testQuestions T on Q.questionID = T.questionID)
-             where T.testID =  <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
-			 order by questionID asc) as R order by questionID desc
+             Q.option3,Q.option4 FROM (questions Q INNER JOIN testQuestions T ON Q.questionID = T.questionID)
+             WHERE T.testID =  <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
+			 ORDER BY questionID ASC) AS R ORDER BY questionID DESC
 		   </cfquery>
+		   <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+					  Message: #message#" />
+		</cfcatch>
+		</cftry>
+
+		   <cfset var checked = 0>
+		   <cfif structKeyExists(session.testData.testResponse, "#getTestQuestionQuery.questionID#")>
+		      <cfset var checked = structFind(session.testData.testResponse, "#getTestQuestionQuery.questionID#")>
+		   </cfif>
+
 		   <cfset testArray = arraynew(1)>
 
-		    <CFSET testArray = [getTestQuestionQuery.questionID,getTestQuestionQuery.questionDescription,getTestQuestionQuery.option1,getTestQuestionQuery.option2,getTestQuestionQuery.option3,getTestQuestionQuery.option4] />
+		    <CFSET testArray = [getTestQuestionQuery.questionID, getTestQuestionQuery.questionDescription,
+		    getTestQuestionQuery.option1, getTestQuestionQuery.option2, getTestQuestionQuery.option3,
+		    getTestQuestionQuery.option4, checked] />
 	        <cfreturn testArray>
 
 		</cffunction>
@@ -137,12 +172,11 @@
 		   <cfargument name="selectedOption" type="string" required="true" >
 		   <cftry>
 		   <cfquery name="resultQuery" datasource="examinationSystem">
-		      select isCorrect from questions
-             where questionID = <cfqueryparam value="#arguments.questionID#" cfsqltype="cf_sql_integer" />
+		      SELECT isCorrect FROM questions
+             WHERE questionID = <cfqueryparam value="#arguments.questionID#" cfsqltype="cf_sql_integer" />
 		   </cfquery>
 		   	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -150,9 +184,28 @@
 					  Message: #message#" />
 		</cfcatch>
 		</cftry>
+		 <cfif NOT structKeyExists(session.testData.testResponse, "#arguments.questionID#")>
 		   <cfif arguments.selectedOption eq resultQuery.isCorrect>
 			<cfset session.testData.correct = session.testData.correct+1>
 		   </cfif>
+		   <cfset temp=StructInsert(session.testData.testResponse,"#arguments.questionID#",arguments.selectedOption,false)>
+		   <cfelse>
+		   <cfif ( (arguments.selectedOption eq resultQuery.isCorrect)
+		      AND (NOT arguments.selectedOption eq structFind(session.testData.testResponse, "#arguments.questionID#"))
+		          )>
+			         <cfset session.testData.correct = session.testData.correct+1>
+			         <cfset temp=StructInsert(session.testData.testResponse,"#arguments.questionID#",
+			                arguments.selectedOption,true)>
+			</cfif>
+			<cfif ( (NOT arguments.selectedOption eq resultQuery.isCorrect)
+		      AND (NOT arguments.selectedOption eq structFind(session.testData.testResponse, "#arguments.questionID#"))
+		          )>
+			         <cfset temp=StructInsert(session.testData.testResponse,"#arguments.questionID#",
+			                arguments.selectedOption,true)>
+			</cfif>
+
+		 </cfif>
+		<!--- </cfif> --->
 		   <cfreturn true>
 	   </cffunction>
 
@@ -161,27 +214,37 @@
 <!---Validation at Submit--->
 		<cffunction name="finalResult" access="remote" returnformat="JSON">
 			<cfargument name="testID" type="numeric" required="true" >
-		   <cfif TIMEFORMAT(Now(),"hh:mm:ss") GTE Session.testData.endTestTime>
+			<cftry>
+		    <cfif TIMEFORMAT(Now(),"HH:mm:ss") GT Session.testData.endTestTime>
 			   <cfquery result="saveFaultResultQuery" datasource="examinationSystem">
-		      update testStudent set
-		      result = 0
-		      where testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
-		      and testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
-		   </cfquery>
-			<cfset structdelete(session,'testData')/>
-		    <cfreturn false>
-		   </cfif>
-		   <cfset var correctTemp = session.testData.correct>
-		   <cfset var examScore = session.testData.correct/session.testData.total>
-		   <cfquery result="storeResultQuery" datasource="examinationSystem">
-		      update testStudent set
-		      result = <cfqueryparam value= #examScore# cfsqltype="cf_sql_decimal" />
-		      where testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
-		      and testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
-		   </cfquery>
+		          UPDATE testStudent SET
+		          result = 0
+		          WHERE testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
+		          AND testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
+		       </cfquery>
+			   <cfset structdelete(session,'testData')/>
+		       <cfreturn false>
+		    </cfif>
+		    <cfset var correctTemp = session.testData.correct>
+		    <cfset var examScore = session.testData.correct/session.testData.total>
+		    <cfquery result="storeResultQuery" datasource="examinationSystem">
+		      UPDATE testStudent SET
+		      result = <cfqueryparam value= #examScore# scale='2' cfsqltype="cf_sql_decimal" />
+		      WHERE testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
+		      AND testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
+		    </cfquery>
+		    <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+					  Message: #message#" />
+		    </cfcatch>
+		    </cftry>
 
 		   <!---store result in teststudent--->
-		   <cfset structdelete(session,'testData')/>
+		    <cfset structdelete(session,'testData')/>
 			<cfreturn correctTemp>
 		</cffunction>
 
@@ -196,17 +259,16 @@
 
 
 
-<!---get current test duration for coutdown timer--->
+<!---get current test duration for countdown timer--->
         <cffunction name="duration" access="remote" returnformat="JSON">
 		   <cfargument name="testID" type="numeric" required="true" >
 		   <cftry>
 		   <cfquery name="durationQuery" datasource="examinationSystem">
-		      select duration from tests
-             where testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
+		      SELECT duration FROM tests
+             WHERE testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
 		   </cfquery>
 		   	 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -221,38 +283,26 @@
 <!---function to save result and end test at page load if ongoing test exists--->
 		<cffunction name="submitStopTest" access="public" output="false">
 
+			<cftry>
 		   <cfquery result="submitStopTestQuery" datasource="examinationSystem">
-		      update testStudent set
+		      UPDATE testStudent SET
 		      result = <cfqueryparam value= #session.testData.correct/session.testData.total# cfsqltype="cf_sql_decimal" />
-		      where testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
-		      and testID = <cfqueryparam value= #session.testData.testID# cfsqltype="cf_sql_integer" />
+		      WHERE testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
+		      AND testID = <cfqueryparam value= #session.testData.testID# cfsqltype="cf_sql_integer" />
 		   </cfquery>
+		   <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+					  Message: #message#" />
+		   </cfcatch>
+		   </cftry>
 		   <cfset structdelete(session,'testData')/>
 
 
 		</cffunction>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

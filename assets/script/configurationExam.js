@@ -1,6 +1,7 @@
 //global variable declaration
 var arrayTime,allTime;
 $(document).ready(function () {
+	//Submit button handler: checks if all fields are valid
     $("#button").on("click", function () {
         if($("#duration").val().length == 0 || $("#datetext").val().length == 0 ||
         		$("#testName").val().length == 0 || $("#timePicker option:selected").text().length == 0 ){
@@ -9,8 +10,29 @@ $(document).ready(function () {
         }
         else{
         	addTest();
+        	$.ajax({
+   			 url:"../cfc/configExam.cfc",
+   			 data: {
+   				 method : "testQuestion",
+   				 testName : $("#testName").val()
+   			},
+   			type:"POST",
+   			async:false,
+   			success: function(data){
+   			console.log(data);
+   		    displayQuestion(data);
+   			},
+   			error: function(){
+   				alert("AJAX error");
+   				return false;
+   			}
+   		}); 
+        	$("#addQuesForm")[0].reset();
+        	$("#timePicker").prop("selectedIndex", -1);
         }
     });
+    
+    
     $("#timePicker").on("change", function(){
 		validateTime($("#timePicker").val());
 	})
@@ -66,8 +88,8 @@ $(document).ready(function () {
         	$('#timePicker').prop('disabled', false);
         }
      });
+
 	
-	/*
 	$('#quesSubmit').click(function(e) {
 		var checked = [];
         $(':checkbox:checked').each(function(i){
@@ -79,20 +101,21 @@ $(document).ready(function () {
 			 url:"../cfc/configExam.cfc",
 			 data: {
 				 method : "addQuestionTest",
-				 questionIDs : checked.join(),
-				 testID : $('#testName').val()
+				 questionIDs : checked.join()
 			},
 			type:"POST",
+			//async : false,
 			success: function(data){
-			if(data == "false"){
-				console.log(data);
-				alert("Question selection for exam failed");
-				return false;
-	        }
-			else{
+			if(data == "true"){
+				
 				console.log(data);
 				$('#myModal').modal('hide');
 				$("#testQuesForm")[0].reset();
+	        }
+			else{
+				console.log(data);
+				alert("Question selection for exam failed");
+				return false;
 				
 	        }
 
@@ -103,7 +126,7 @@ $(document).ready(function () {
 			}
 		}); 
 		
-	})*/
+	})
 	
 	
 	
@@ -195,7 +218,7 @@ function timeCheck() {
 	return returnTime;
 
 }
-//not working
+
 function validateTime(selectedTime){
 var duration =$("#duration").val();
 var index=(allTime.indexOf(selectedTime)+(duration-1))%allTime.length;
@@ -242,30 +265,10 @@ function addTest() {
 
 		},
 		type:"POST",
+		async : false,
 		success: function(data){
 			console.log(data);
             alert("exam added");
-   /* -----------get ques.add modal to show questons.then save questions based on test name
-            
-            $.ajax({
-   			 url:"../cfc/configExam.cfc",
-   			 data: {
-   				 method : "testQuestion",
-   			},
-   			type:"POST",
-   			async:false,
-   			success: function(data){
-   			console.log(data);
-   		    displayQuestion(data);
-   			},
-   			error: function(){
-   				alert("AJAX error");
-   				return false;
-   			}
-   		}); */
-
-            $("#addQuesForm")[0].reset();
-            
 		},
 		error: function(){
 			alert("AJAX error");
@@ -275,22 +278,29 @@ function addTest() {
 
 
 }
+//function to validate duration
 function validateNumber(number) {
     var length = $(number).val().length;
         var numbers =/^\d{1}$/;
-        if ($(number).val().match(numbers) && $(number).val() > 0) {
+        if ($(number).val() > 0 && $(number).val().match(numbers)) {
             $(number).css("border", "1px solid #ccc");
             $(':input[type="button"]').prop('disabled', false);
         }
-        else {
-        	$(number).css("border", "1px solid #ff0000");
+        else if($(number).val() > 10){
         	$("#duration").val("");
         	alert("test duration can be at max of 9 hours");
         	$(':input[type="button"]').prop('disabled', true);
         }
+        else {
+        	$(number).css("border", "1px solid #ff0000");
+        	$("#duration").val("");
+        	alert("Please enter valid input. ");
+        	$(':input[type="button"]').prop('disabled', true);
+        }
     
 }
-/*
+
+//function to open modal for question addition to the currently updated test
 function displayQuestion(data){
 	
 	   var question = $.parseJSON(data);
@@ -303,11 +313,10 @@ function displayQuestion(data){
 	    	$('#myModal').modal('show'); 
 	    }
 	    $('#testID').val(question[1][2]);
-	    
+	    $('#questionSelectTable').DataTable();
 	}
 
-*/
-
+//string prototype function to replaceAt given index with given replacement on a string 
 String.prototype.replaceAt=function(index, replacement) {
     return this.substr(0, index) + replacement+ this.substr(index + replacement.length);
 }
