@@ -1,6 +1,9 @@
-
-<cfif NOT isUserLoggedIn()>
-<cflocation url="login.cfm" addtoken="no">
+<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+	<cflocation url="login.cfm" addtoken="no">
+	<cfelse>
+	<cfif session.stLoggedInUser.designation EQ "teacher">
+		<cflocation url="accessDenied.cfm" addtoken="no">
+	</cfif>
 </cfif>
 <html>
 <head>
@@ -14,6 +17,7 @@
 <link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-dd-MMM-yyyy.js"></script>
 
 
 

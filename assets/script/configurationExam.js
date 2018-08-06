@@ -1,11 +1,19 @@
 //global variable declaration
-var arrayTime,allTime;
+var arrayTime, allTime, testNameCheck=1;
 $(document).ready(function () {
 	//Submit button handler: checks if all fields are valid
     $("#button").on("click", function () {
         if($("#duration").val().length == 0 || $("#datetext").val().length == 0 ||
         		$("#testName").val().length == 0 || $("#timePicker option:selected").text().length == 0 ){
         	alert("All fields are required");
+        	return false;
+        }
+        else if(testNameCheck == 2){
+        	alert("Test name can contain words and numbers only");
+        	return false;
+        }
+        else if(testNameCheck == 0){
+        	alert("Existing Test. Choose a different test name");
         	return false;
         }
         else{
@@ -140,17 +148,16 @@ function nameCheck() {
 	var patt = /^[a-zA-Z0-9 ]+$/;
     if ($("#testName").val().match(patt)) {
     	$("#testName").css("border", "1px solid #a9a9a9");
-    	$(':input[type="button"]').prop('disabled', false);
+    	testNameCheck = 1;
             
     }
     else if($("#testName").val() == ""){
     	$("#testName").css("border", "1px solid #ff0000");
-    	$(':input[type="button"]').prop('disabled', true);
             return false;    	
     }
     else {
     	$("#testName").css("border", "1px solid #ff0000");
-    	$(':input[type="button"]').prop('disabled', true);
+    	testNameCheck = 2;
             alert("Please use alphabets and numbers only.");
             return false;
     }
@@ -165,16 +172,17 @@ function nameCheck() {
 		async: false,
 		type:"POST",
 		success: function(data){
+			console.log(data);
 
-		if(data == 'true'){
+		if(data == "true"){
 
 	        $(testName).css("border","1px solid #a9a9a9");
-			 $(':input[type="button"]').prop('disabled', false);
+	        testNameCheck = 1;
         }
 		else{
-			alert("Existing test. Choose a different name.");
 	        $(testName).css("border","1px solid #ff0000");
-			 $(':input[type="button"]').prop('disabled', true);
+	        testNameCheck = 0;
+	        alert("Existing test. Choose a different name.");
 
 		}
 		},
@@ -236,22 +244,6 @@ console.log(arrayTime);
 
 }
 
-function timeString(string, character, n){
-    var count= 0, i=0,temp="";
-    while(count<n && (i=string.indexOf(character,i)+1)){
-        count++;
-    }
-    if(count== n){
-    	var timeString24 =string.substr(i);
-    	var H = +timeString24.substr(0, 2);
-    	var h = H % 12 || 12;
-    	var ampm = (H < 12 || H === 24) ? "AM" : "PM";
-    	timeString24 = h + timeString24.substr(2, 3) + ampm;
-    	return string.substr(i);
-    }
-   
-    return NaN;
-}
 
 function addTest() {
 	$.ajax({

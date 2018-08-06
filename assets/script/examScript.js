@@ -69,7 +69,13 @@ $(document).ready(function () {
             validateText("#country");
             }
         });
-    $("#msform").submit(validateForm) ;
+    $( "#submit" ).on( "click", function() {
+    	if(validateForm()){
+    	   submitForm();
+    	}
+    	});
+    
+   
     $( "#teacher" ).on( "click", function() {
     	$("#designation").val("teacher");
     	});
@@ -79,87 +85,44 @@ $(document).ready(function () {
 });
 function validateForm(){
 	var departmentCheck=0;
-	 if(checkEmpty("#fname")){
-	     validateText("#fname");
-	    }
-	 else{
+	 if($("#fname").val().length == 0){
 		 alert("Empty fields in the form. Please resubmit with valid entries");
 		 return false;
 		 }
-	    if($("#mname").val().length != 0){
-	        validateText("#mname");
-	    }
-	    else{
-	    	$("#mnameError").text("");
-	    }
-		 
-	    if(checkEmpty("#lname")){
-	        validateText("#lname");
-	    }
-		 else{
+	    if($("#lname").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
+			 return false;
+			 }
+	    if($("#email").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
+			 return false;
+			 }
+	    if($("#phone").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
+			 return false;
+			 }
+	    if($("#password").val().length == 0){
 			 alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;
 			 }
-	    if(checkEmpty("#email")){
-	        validateMail("#email");
-	    } 
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
+	    if($("#cpassword").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;
 			 }
-	    if(checkEmpty("#phone")){
-	        validatePhNo("#phone");
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
-			 return false;
-			 }
-	    if(checkEmpty("#password")){
-	        if(validatePassword("#password")){
-	        if($("#cpassword").val().length != 0){
-		        matchPassword(("#password"),("#cpassword"));}}
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
-			 return false;
-			 }
-	    if(checkEmpty("#cpassword")){
-	    	if(validatePassword("#cpassword")){
-	    	if($("#password").val().length != 0){
-	        matchPassword(("#password"),("#cpassword"));}}
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
+	    if($("#address").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;}
-	    if(checkEmpty("#address")){
-	        validateAddress("#address");
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
+	    if($("#city").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;}
-	    if(checkEmpty("#city")){
-	        validateText("#city");
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
+	    if($("#zip").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;}
-	    if(checkEmpty("#zip")){
-	        validateZip("#zip");
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
+	    if($("#state").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;}
-	    if(checkEmpty("#state")){
-	        validateText("#state");
-	    }	    
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
-			 return false;}
-	    if(checkEmpty("#country")){
-	        validateText("#country");
-	    }
-		 else{
-			 alert("Empty fields in the form. Please resubmit with valid entries");
+	    if($("#country").val().length == 0){
+	    	alert("Empty fields in the form. Please resubmit with valid entries");
 			 return false;}
 
 	    $("#msform span").each(function(index, elem){
@@ -171,6 +134,8 @@ function validateForm(){
 	    });
 	    if(departmentCheck == 1){
 	        return false;
+	    }else{
+	    	return true;
 	    }
 	  
 	    
@@ -285,24 +250,13 @@ function validateZip(number) {
     
 }
 
-function emailCheck() {/* 
-	$.post("emailCheck.cfc",
-        	{
-        	email : $(email).val()
-        	},
-        	function(data,status){ 
-        		 alert(status);
-        		}).fail(function(err, status,response) {
-        			alert(err+"AJAX request has failed!! Please try again.");   
-        		});
-	
-	*/
-	var mailvar=$("#email").val();
+function emailCheck() {
+	var mailVar=$("#email").val();
 	$.ajax({
-		 url:"../cfc/emailCheck.cfc",
+		 url:"../cfc/login.cfc",
 		 data: {
 			 method : "mailChecker",
-			 email : mailvar
+			 email : mailVar
 		},
 		type:"POST",
 		success: function(data){
@@ -321,3 +275,38 @@ function emailCheck() {/*
 
 
 }
+
+function submitForm() {
+	
+	$.ajax({
+		 url:"../cfc/registration.cfc",
+		 data: {
+			 method : "registerUser",
+			 email : $("#email").val(),
+			 password : $("#password").val(),
+			 fname : $("#fname").val(),
+			 mname : $("#mname").val(),
+			 lname : $("#lname").val(),
+			 phone : $("#phone").val(),
+			 address : $("#address").val(),
+			 city : $("#city").val(),
+			 state : $("#state").val(),
+			 country : $("#country").val(),
+			 zip : $("#zip").val(),
+			 designation : $("#designation").val()
+		},
+		type:"POST",
+		async:false,
+		success: function(data){
+		console.log(data);
+		alert("Registration Successful");
+		window.location = "login.cfm";
+		},
+		error: function(){
+			alert("Registration Failed");
+			return false;
+		}
+	});
+
+}
+

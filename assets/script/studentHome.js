@@ -16,9 +16,14 @@ $(document).ready(function () {
 		type:"POST",
 		success: function(data){
 	    displayTests(data);
+	    
 	    $('#examDisplayTable').DataTable( {
-	    		"aaSorting": [[1,'desc'],[2,'desc']]
-	    } );
+	    		
+	    		"columnDefs": [
+	    	        { type: 'date-dd-mmm-yyyy', targets: 1 }
+	    	      ],
+	    	      "aaSorting": [[1,'desc'],[2,'desc']]
+	    });
 		},
 		error: function(){
 			alert("AJAX error");
@@ -129,12 +134,6 @@ function displayTests(data){
         	tests[i][5]*100 +'%</b></td></tr>';
     	}
     	markup = markup+postMarkup;
-    	
-    	
-    	
-    	
-    	
-    	
     	//'</td><td align="center"><input type="checkbox" name="optionSelector[]" value='+
     	//tests[i][0] +' '+check+' ></td></tr>';
        	$("#examDisplayTable tbody").append(markup);
@@ -146,6 +145,7 @@ function displayTests(data){
 
 
 function validateOngoingTest(){
+	var reloadCheck= 0;
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
@@ -160,9 +160,10 @@ function validateOngoingTest(){
 			return true;
 		}
 		else{
+			reloadCheck =1;
 			$('#myModal').modal('hide');
 			alert("Test session expired. Your response has been submitted");
-			location.reload();
+			
 		}
 		},
 		error: function(){
@@ -170,6 +171,9 @@ function validateOngoingTest(){
 			return false;
 		}
 	});
+	 if(reloadCheck == 1){
+		 location.reload();
+	 }
 	
 }
 
@@ -190,20 +194,22 @@ function displayExam(ID){
 		async:false,
 		type:"POST",
 		success: function(data){
+			console.log(data);
 			if(data == "false"){
 				alert("Please start test at mentioned Date");
+				return false;
 			}
 			else if(data =='"wrong time"'){
 				alert("Test can only be started at mentioned Time");
+				return false;
+			}
+			else if(data == '"empty test"'){
+				alert("Test is presently unavailable!!");
+				return false;
 			}
 			else{
 				var recievedData =  $.parseJSON(data);	
 				currentTestRowCount = recievedData;
-// error message if there is no question in the selected test
-				if(currentTestRowCount == 0){
-					alert("Test is presently unavailable!!");
-				}
-				else{
 					$('#examNext').prop('disabled', false);
 					$('#examPrevious').prop('disabled', true);
 					currentTestRow=1;
@@ -216,7 +222,7 @@ function displayExam(ID){
 //set timeout and display countdown
 					timer(testDuration);	
 				}		
-			}
+			
 		},
 		error: function(){
 			alert("AJAX error");
@@ -241,6 +247,9 @@ function createTest(){
 		async:false,
 		type:"POST",
 		success: function(data){
+			if(data == false){
+				return false;
+			}
 		
 		questionRow = $.parseJSON(data);
 		console.log(questionRow);
@@ -282,6 +291,9 @@ function saveResult(questionID,checked){
 		type:"POST",
 		success: function(data){
 		console.log(data);
+		if(data == false){
+			return false;
+		}
 		},
 		error: function(){
 			alert("AJAX error");
@@ -300,8 +312,12 @@ function finalResult(){
 			 testID : currentTestID
 		},
 		type:"POST",
+		async:false,
 		success: function(data){
 		console.log(data);
+		if(data == '"submitted"'){
+			return false;
+		}
 		
 		if(data=="false"){
 			alert("Submission Time out of bounds");
@@ -340,7 +356,7 @@ function duration(){
 function timer(n){
 	
 	var dayNow = new Date();
-    var minutes = dayNow.getMinutes();
+    var minutes = dayNow.getMinutes() + 1;
     n= (n*60*60*1000)- (minutes*60*1000);
     var count =0;
 	

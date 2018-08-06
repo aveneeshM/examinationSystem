@@ -9,12 +9,17 @@ $(document).ready(function () {
 		async:false,
 		type:"POST",
 		success: function(data){
+			console.log(data);
 	    displayTests(data);
 	    $('#examDisplayTable').DataTable( {
 	    	paging:false,
 	    	scrollY:"480px",
 			scrollCollapse: true,
-	    	"aaSorting": [[1,'asc'], [2,'asc']]
+	    	"aaSorting": [[1,'asc'], [2,'asc']],
+	        "columnDefs": [
+	        {"className": "dt-center", "targets": "_all"},
+	        { type: 'date-dd-mmm-yyyy', targets: 1 }
+	      ]
 	    } );
 		},
 		error: function(){

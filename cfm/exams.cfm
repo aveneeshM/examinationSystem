@@ -1,5 +1,10 @@
-<cfif NOT isUserLoggedIn()>
+
+<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
 	<cflocation url="login.cfm" addtoken="no">
+	<cfelse>
+	<cfif session.stLoggedInUser.designation EQ "student">
+		<cflocation url="accessDenied.cfm" addtoken="no">
+	</cfif>
 </cfif>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -14,6 +19,8 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="../assets/css/loggedInStyle.css" media="screen" type="text/css" />
 <script src="../assets/script/exams.js"> </script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-dd-MMM-yyyy.js"></script>
+
 <!---<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">--->
 </head>
 <body>
@@ -40,8 +47,9 @@
 <!---component object to check if atleast one exam is present and then display all exams--->
 <cfset examObj = CreateObject("Component", "examinationSystem.cfc.exams") />
 <cfset examObjQuery = examObj.examAll() />
-<cfset examObjQuestion = examObj.questionAll() />
-<cfif #examObj.examExists()#>
+<!--- <cfset examObjQuestion = examObj.questionAll() /> --->
+<!--- <cfif #examObj.examExists()#> --->
+<cfif #examObjQuery.recordCount#>
 
 	<div class="examListTable">
 		<h3>Tests</h3><br>
@@ -49,7 +57,7 @@
 		<table id="examSelectTable" class="display">
 				<thead>
 					<tr>
-						<th class="hiddenColumn"></th>
+						<!--- <th class="hiddenColumn"></th> --->
 						<th>Test ID</th>
 						<th>Test Name</th>
 						<th>Test Date</th>
@@ -62,13 +70,13 @@
 			   <cfloop query="examObjQuery">
 					<tr>
 
-					<td class="hiddenColumn"></td>
+					<!--- <td class="hiddenColumn"></td> --->
 					<td class="examID"><cfoutput>#testID#</cfoutput></td>
                     <td><cfoutput>#name#</cfoutput></td>
-					<td><cfoutput>#dateformat(startDate,"dd-mm-yyyy")#</cfoutput></td>
+					<td><cfoutput>#dateformat(startDate,"dd-mmm-yyyy")#</cfoutput></td>
 					<td><cfoutput>#duration#</cfoutput></td>
                     <td><cfoutput>#TimeFormat(startTime, "HH:mm:ss")#</cfoutput></td>
-					<td><cfoutput>#dateformat(createdDate,"dd-mm-yyyy")#</cfoutput></td>
+					<td><cfoutput>#dateformat(createdDate,"dd-mmm-yyyy")#</cfoutput></td>
                </tr>
 			</cfloop>
 			</tbody>
@@ -99,7 +107,7 @@
 		</form>
         </div>
         <div class="modal-footer">
-			<button type="button" class="btn btn-default left" id="quesSubmit">Add</button>
+			<button type="button" class="btn btn-default left" id="quesSubmit">Save Changes</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>

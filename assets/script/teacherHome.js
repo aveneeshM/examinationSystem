@@ -1,6 +1,5 @@
 $(document).ready(function () {
 	$('#questionSelectTable').DataTable({
-		title: 'Examination Questions',
 		"aaSorting": [1,'desc'],
 //allign elements at centre
 		"columnDefs": [
@@ -17,9 +16,7 @@ $(document).ready(function () {
 	                      alignment: 'center'
 	                    };     
 	                  },
-	                pageSize: 'LEGAL',
-	                exportOptions: {
-	                }
+	                pageSize: 'LEGAL'
 	            }
 	        ],
 	        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -32,8 +29,6 @@ $(document).ready(function () {
                     $('td', nRow).css('background-color', 'lightgreen');
                 }
             }
-            
-
 	});
 	
 	//dataTable for edit option modal
@@ -45,7 +40,7 @@ $(document).ready(function () {
 	});
 	
 	//select active/inactive/all questions
-	$('input[type="checkbox"]').on('change', function() {
+	$('.questionStatus input[type="checkbox"]').on('change', function() {
 		   $(this).siblings('input[type="checkbox"]').prop('checked', false);
 		   if($(this).val()=="all"){
 			   $(".active").show();
@@ -88,21 +83,26 @@ $(document).ready(function () {
 	
 	//Response to Save Edit button
 	$('#optionSubmit').click(function(e) {
-		var checked = [];
+		var checked = [], status;
         $('#optionSelectTable :radio:checked').each(function(i){
       	  checked[i]=$(this).val();
         
       });
-		console.log(checked);
+        if($("#status").prop("checked") == true){
+        	status = 1;
+        }
+        else{
+        	status = 0;
+        }
 		$.ajax({
 			 url:"../cfc/teacherHome.cfc",
 			 data: {
 				 method : "editQuestion",
 				 options : checked.join(),
-				 questionID : $('#getQuesID').val()
+				 questionID : $('#getQuesID').val(),
+				 status : status
 			},
 			type:"POST",
-			
 			success: function(data){
 			if(data == "false"){
 				console.log(data);
@@ -110,11 +110,10 @@ $(document).ready(function () {
 				return false;
 	        }
 			else{
-				console.log(data);
-				
-				$('#myModal').modal('hide');
+				setInterval(function(){$('#myModal').modal('hide'); }, 100);
+
+				//$('#myModal').modal('hide');
 				location.reload(true);
-				//$("#testQuesForm")[0].reset();
 				
 	        }
 
@@ -140,6 +139,14 @@ function displayQuestion(data){
     $('#quesID').html("&nbsp;OES"+question[0]+" : &nbsp");
    	$('.questionStatement').html("&nbsp"+question[1]+"<br><br>");
     $("#getQuesID").val(question[0]);
+    
+    if(question[7] == 1){
+        $("#status").prop("checked", true);
+    }
+    else{
+    	$("#status").prop("checked", false);
+    }
+    
    	for(var i=0; i<4;i++){
    		if(question[6].indexOf(++i) >= 0){
    			check = "checked";

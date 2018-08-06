@@ -1,7 +1,12 @@
 
-<cfif NOT isUserLoggedIn()>
-<cflocation url="login.cfm" addtoken="no">
+<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+	<cflocation url="login.cfm" addtoken="no">
+	<cfelse>
+	<cfif session.stLoggedInUser.designation EQ "student">
+		<cflocation url="accessDenied.cfm" addtoken="no">
+	</cfif>
 </cfif>
+
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -52,7 +57,7 @@
 <cfset teacherObj = CreateObject("Component", "examinationSystem.cfc.teacherHome") />
 <cfset teacherObjQuestion = teacherObj.questionAll() />
 <!---Check to see if question table has atleast one entry--->
-	<cfif #teacherObj.questionExists()#>
+	<cfif #teacherObjQuestion.recordCount#>
 		<h3>Questions</h3><br>
 			<!---Question display table--->
 		<table id="questionSelectTable" class="display">
@@ -110,7 +115,8 @@
         </div>
         <div class="modal-body">
 			<form class="quesOptionForm" id="quesOptionForm" method="POST">
-				<h4 id="quesID"></h4><p class="questionStatement"></p><input type="hidden" id="getQuesID">
+				<h4 id="quesID"></h4><p class="questionStatement"></p>
+				<input type="hidden" id="getQuesID">
 
 			<table id="optionSelectTable" class="display">
 				<thead>
@@ -122,6 +128,10 @@
                <tbody>
 			</tbody>
           </table>
+		<label class="switch">
+         <input type="checkbox" id="status">
+             <span class="slider round"></span>
+         </label>
 		</form>
         </div>
         <div class="modal-footer">

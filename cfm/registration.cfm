@@ -32,7 +32,7 @@
 		<!--header end -->
 
 <!-- multistep form -->
-<form id="msform" name="registration" method="POST" action="post.cfm">
+<form id="msform" name="registration" method="POST">
   <!-- progressbar -->
   <ul id="progressbar">
     <li class="active">Account Type</li>
@@ -86,7 +86,7 @@
 	<span id="zipError"></span>
     <input class="halfwidth" type="text" id="zip" name="zip" placeholder="ZIP Code" />
     <input type="button" name="previous" class="previous action-button" value="Previous" />
-    <input type="submit" name="submit" class="submit action-button" value="Submit" />
+    <input type="button" id="submit" name="submit" class="submit action-button" value="Submit" />
   </fieldset>
 </form>
 </body>

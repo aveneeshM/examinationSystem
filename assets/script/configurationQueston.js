@@ -1,12 +1,7 @@
-//insert into tests values('test1', '2008-11-11', 2, 25, 9, '2008-11-11', '08:00:00')
-/////for select input..status:not started
+//global variables
 var optionArray=[];
 $(document).ready(function () {
-	
-	//$('input[type="checkbox"]').on('change', function() {
-		//   $('input[type="checkbox"]').not(this).prop('checked', false);
-		//});
-	   
+//Handler for submit button		   
 	   $("#button").on("click", function () {
 	        if($("#question").val().length == 0 || $("#option1").val().length == 0 ||
 	        		$("#option2").val().length == 0 || $("#option3").val().length == 0 || $("#option4").val().length == 0){
@@ -31,7 +26,7 @@ $(document).ready(function () {
 	        }
 	    });
 });
-
+//function to add question 
 function addQuestion() {
 	$.ajax({
 		 url:"../cfc/configQuestion.cfc",

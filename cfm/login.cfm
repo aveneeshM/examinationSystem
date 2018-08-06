@@ -29,7 +29,7 @@
 		</div>
 <!--header end -->
 <!--Log-in area-->
-	<cfif isUserLoggedIn()>
+	<cfif structKeyExists(session,"stLoggedInUser")>
 		<cfif isUserInRole('teacher')>
 			<cflocation url="teacherHome.cfm" addtoken="no">
 			<cfelse>
@@ -40,12 +40,12 @@
 <div class="login-card">
     <h1>Log-in</h1><br>
 
-  <form class="login-form" id="loginForm" method="POST" onsubmit="return validateForm()">
+  <form class="login-form" id="loginForm"<!---  method="POST" onsubmit="validateForm()" --->>
 	<span id="userError"></span>
     <input type="text" name="user" id="user" placeholder="Email ID">
 	<span id="passwordError"></span>
     <input type="password" name="pass" id="password" placeholder="Password">
-    <input type="submit" name="login" class="login login-submit" value="login">
+    <input type="button" id="submitButton" name="login" class="login login-submit" value="login">
   </form>
 
   <div class="login-help">

@@ -5,7 +5,7 @@ $(document).ready(function () {
 });
 function logOutCall() {
 	$.ajax({
-		 url:"../cfc/designationCheck.cfc",
+		 url:"../cfc/login.cfc",
 		 data: {
 			 method : "doLogOut"
 		},

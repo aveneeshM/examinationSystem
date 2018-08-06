@@ -7,14 +7,13 @@
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
 
-  <cffunction name="testInfo" access="public" returntype="array">
+<!---   <cffunction name="testInfo" access="public" returntype="array">
 	<cftry>
 	<cfquery name="testInfoQuery" datasource="examinationSystem">
-          select name from tests
+          SELECT name FROM tests
 	</cfquery>
 		 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
@@ -28,8 +27,8 @@
     <cfset myarray[CurrentRow]=#name#>
     </cfloop>
     <cfreturn #myarray#/>
-  </cffunction>
-
+  </cffunction> --->
+<!---add question to  database--->
   <cffunction name="addQuestion" access="remote" returntype="string" returnformat="JSON">
 	<cfargument name="question" type="string" required="true" >
 	<cfargument name="opt1" type="string" required="true" >
@@ -45,11 +44,11 @@
 	<!---><cfset var correctString = arrayToList(arguments.correct)>--->
 	<cftry>
 	<cfquery result="insertOptions" datasource="examinationSystem">
-			insert into questions
+			INSERT INTO questions
 			(
 			questionDescription,difficultyLevel,createdDate,option1,option2,option3,option4,isCorrect
 			)
-		    values
+		    VALUES
 		    (
 		    <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.question#" />,
 		    <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.level#" />,
@@ -64,12 +63,10 @@
 	<cfreturn true/>
 		 <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
-				   	  Exception type: #type#
-					  Message: #message#" />
+				   	  Exception type: #type#" />
 		</cfcatch>
 		</cftry>
   </cffunction>

@@ -1,5 +1,9 @@
-<cfif NOT isUserLoggedIn()>
+<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
 	<cflocation url="login.cfm">
+	<cfelse>
+	<cfif session.stLoggedInUser.designation EQ "student">
+		<cflocation url="accessDenied.cfm">
+	</cfif>
 </cfif>
 <html>
 <head>

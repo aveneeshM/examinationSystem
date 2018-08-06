@@ -1,21 +1,18 @@
 $(document).ready(function () {
 
-	
+//Add datatable to created exam table	
 	$('#examSelectTable').DataTable({
 		info:false,
-		"aaSorting": [1,'desc'],
+		"aaSorting": [[2,'desc'],[4,'desc']],
 		//ordering:false,
 		"columnDefs": [
-	        {"className": "dt-center", "targets": "_all"}
+	        {"className": "dt-center", "targets": "_all"},
+	        { type: 'date-dd-mmm-yyyy', targets: [2,5] }
 	      ],
 	      
 	});
 	
-	
-	
-	
-	
-	
+//Add on click event to table rows
 	$("#examSelectTable tbody").on('click', 'tr', function () {
 	    var extractedID = $(this).find(".examID").text();
 	    //extractedID = extractedID.substr(4);
@@ -30,7 +27,23 @@ $(document).ready(function () {
 			success: function(data){
 			console.log(data);
 		    displayQuestion(data);
-		    $('#questionSelectTable').DataTable();
+		    
+		    
+		    
+		    if ( $.fn.dataTable.isDataTable( '#questionSelectTable' ) ) {
+		        $('#questionSelectTable').DataTable();
+		    }
+		    else {
+		         		    
+				    $('#questionSelectTable').DataTable({
+				    	"aaSorting": [0,'desc'],
+				    	"ordering": false
+				    	  });
+		    }
+		    
+		    
+		    
+
 			},
 			error: function(){
 				alert("AJAX error");
@@ -39,7 +52,7 @@ $(document).ready(function () {
 		}); 
 	});
 	
-
+//event handler to Question Submit button
 	$('#quesSubmit').click(function(e) {
 		var checked = [];
         $(':checkbox:checked').each(function(i){
@@ -77,14 +90,14 @@ $(document).ready(function () {
 		
 	})
 });
-
+//add content to question select modal
 function displayQuestion(data){
 	
    var question = $.parseJSON(data);
-   $("#questionSelectTable > tbody").html("");
+   $("#questionSelectTable > tbody").html("")
     for(var i=0; i<question.length;i++){
     	var markup = '<tr><td align="center">' + question[i][1] + 
-    	'</td><td align="center"><input type="checkbox" name="questionSelector[]" value='+
+    	'</td><td align="center"><input type="checkbox"'+ question[i][3]+' name="questionSelector[]" value='+
     	question[i][0]+'></td></tr>';
     	$("#questionSelectTable tbody").append(markup);
     	
@@ -93,6 +106,8 @@ function displayQuestion(data){
     $('#testID').val(question[1][2]);
     
 }
+
+
 
 
 

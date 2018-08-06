@@ -1,48 +1,60 @@
 $(document).ready(function () {
 	$("#user").on("blur", function (e) {
         if(checkEmpty("#user")){
-            if(!validateMail("#user"));
+        	 var patt = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        	    if ($("#user").val().match(patt)) {
+        	        $("#user").css("border", "1px solid #ccc");
+        	        $("#user").text("");
+        	        if(!userCheck()){
+        	        	return false;
+        	        };
+        	    }
+        	    else {
+        	        $("#user").css("border", "1px solid #ff0000");
+        	        $("#userError").text("Enter valid email address");
+        	        return false;
+        	    }
             
             }
         
     });
 	$("#password").on("blur", function (e) {
-        if(!checkEmpty("#password")){
-        	 $("#passwordError").text("Password can not be empty!");
-            }
-    
+        checkEmpty("#password");
     });
 	
-    //$("#loginForm").submit(validateForm) ;
+	$("#submitButton").on("click", function (e) {
+		if(checkEmpty("#user")){
+       	 var patt = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+       	    if ($("#user").val().match(patt)) {
+       	        $("#user").css("border", "1px solid #ccc");
+       	        $("#user").text("");
+       	        userCheck();
+       	    }
+       	    else {
+       	        $("#user").css("border", "1px solid #ff0000");
+       	        $("#userError").text("Enter valid email address");
+       	        return false;
+       	    }}
+		else{
+			return false;
+		}
+       	 if(!checkEmpty("#password")){
+       		
+       		 return false;
+       	 }
+       	if($("#userError").text().length > 0){
+       		alert("ga");
+      		 return false;
+      	 }
 	
+
+			doLogin();
+		
+		
+    });
 });
-function validateForm(){
-var valid =0;
 
-        if(checkEmpty("#user")){
-            if(!validateMail("#user")){
-            	valid =1;
-            } }
-            else{
-            	$("#user").css("border", "1px solid #ff0000");
-                $("#user"+"Error").text("Email address can not be empty");
-            	valid = 1;
-           
-            }
 
-        if(!checkEmpty("#password")){
-        	 $("#passwordError").text("Password can not be empty!");
-        	 valid = 1;
-            }
-        if(valid == 1){
-        	return false;
-        }
-        if(!passwordCheck()){
-        	return false;
-        }
-        designationCheck();
-
-}
 function checkEmpty(field){
 	
     if($(field).val().length > 0){
@@ -52,39 +64,27 @@ function checkEmpty(field){
     }
     else{       
         $(field).css("border", "1px solid #ff0000");
-        $(field+"Error").text("Email address can not be empty");
-        return false;
-    }
-}
-function validateMail(mail) {
-    var patt = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-    if ($(mail).val().match(patt)) {
-        $(mail).css("border", "1px solid #ccc");
-        $(mail+"Error").text("");
-        userCheck();
-        return true;
-    }
-    else {
-        $(mail).css("border", "1px solid #ff0000");
-        $(mail+"Error").text("Enter valid email address");
+        $(field+"Error").text("Required Field");
         return false;
     }
 }
 function userCheck() {
+	var returnVal = 1;
 	$.ajax({
-		 url:"../cfc/emailCheck.cfc",
+		 url:"../cfc/login.cfc",
 		 data: {
 			 method : "mailChecker",
 			 email : $("#user").val()
 		},
 		type:"POST",
+
 		success: function(data){
 		console.log(data);
 		if(data == "false"){
 			 $("#user").css("border", "1px solid #ff0000");
 		        $("#userError").text("Email Address not listed. SignUp!!");
-
-		        return false;
+		        returnVal=0;
+		        
 		}
 		},
 		error: function(){
@@ -92,57 +92,34 @@ function userCheck() {
 			return false;
 		}
 	});
-}
-function passwordCheck() {
-	var isPassword =true;
-	$.ajax({
-		 url:"../cfc/passwordCheck.cfc",
-		 data: {
-			 method : "passwordChecker",
-			 password : $("#password").val(),
-			 email : $("#user").val()
-		},
-		type:"POST",
-		async : false,
-		success: function(data){
-			
-		  if(data == "false"){
-			 $("#password").css("border", "1px solid #ff0000");
-			 if($("#userError").val() == ""){
-		        $("#passwordError").text("Incorrect Password");}
-		        isPassword = false;
-		}},
-		error: function(){
-			alert("AJAX error");
-			return false;
-		}
-		
-	});
-	return isPassword;
+	return returnVal;
 }
 
-function designationCheck() {
+function doLogin() {
+
 	$.ajax({
-		 url:"../cfc/designationCheck.cfc",
+		 url:"../cfc/login.cfc",
 		 data: {
-			 method : "designationChecker",
-			 user : $("#user").val(),
+			 method : "doLogin",
+			 email : $("#user").val(),
 			 password : $("#password").val()
 		},
 		async: false,
 		type:"POST",
-		//dataType: 'JSON',
 		success: function(data){
 
+
 		if(data == '"teacher"'){
-			$("#loginForm").attr("action", "teacherHome.cfm");
+			window.location = "teacherHome.cfm";
         }
 		else if(data == '"student"'){
-			$("#loginForm").attr("action", "studentHome.cfm");
+			window.location = "studentHome.cfm";
 			}
 		else{
-			alert("user Inactive");
+			alert("UserID and Password do not match\n" +
+					"Provide Correct Password");
 			$("#loginForm")[0].reset();
+			return false;
 			
 		}
 		},
@@ -151,6 +128,5 @@ function designationCheck() {
 			return false;
 		}
 	});
-	//return designationCheckVariable;
 
 }
