@@ -7,44 +7,20 @@ var currentTestRow;
 $(document).ready(function () {	
 	
 //get list of selected tests
-
-	 $.ajax({
-		 url:"../cfc/studentHome.cfc",
-		 data: {
-			 method : "getTest"
-		},
-		async:false,
-		type:"POST",
-		success: function(data){
-	    displayTests(data);
-	    
-	    $('#examDisplayTable').DataTable( {
-	    		
-	    		"columnDefs": [
-	    	        { type: 'date-dd-mmm-yyyy', targets: 1 }
-	    	      ],
-	    	      "aaSorting": [[1,'desc'],[2,'desc']]
-	    });
-		},
-		error: function(){
-			alert("AJAX error");
-			return false;
-		}
-	});
-	 
-	 
+	selectedTest(getTest); 
+	
 //start test button response.button value is test id 
 	 $('#examDisplayTable').on('click', '.modalOpener', function(e){
 	 //$(".modalOpener").on("click", function(e){
 	        e.preventDefault();
 //Function call to start exam
-	        displayExam($(this).val());
+	        startExam($(this).val(),checkTest);
 	    });
 	 
 	 
 //next question button response
 	 $("#examNext").on("click", function(e){
-		 validateOngoingTest();
+		 validateOngoingTest(testSessionCheck);
 //disable next button for last question
 		 if(currentTestRow == currentTestRowCount-1){
 				$('#examNext').prop('disabled', true);
@@ -62,14 +38,14 @@ $(document).ready(function () {
 		 currentTestRow+=1;
 		 saveResult(questionID,checked.join());
 //function call to display next question
-		 createTest();
+		 createTest(generateQuestion);
 	 });
 	 
 
 	 
 //previous question button response
 	 $("#examPrevious").on("click", function(e){
-		 validateOngoingTest();
+		 validateOngoingTest(testSessionCheck);
 //disable previous button for first question 
 		 if(currentTestRow == 2){
 				$('#examPrevious').prop('disabled', true);
@@ -87,11 +63,11 @@ $(document).ready(function () {
 		 currentTestRow-=1;
 		 saveResult(questionID,checked.join());
 //function call to display next question
-		 createTest();
+		 createTest(generateQuestion);
 	 });
 	 
 	 $("#examSubmit").on("click", function(e){
-		 validateOngoingTest();
+		 validateOngoingTest(testSessionCheck);
 
 		 var questionID = $("#questionID").val();
 		 var checked = [];
@@ -102,14 +78,39 @@ $(document).ready(function () {
 //close modal after submit
 	        $('#myModal').modal('hide');
 //generate calculated result
-	        finalResult();
+	        finalResult(displayResult);
 	        
 		 
 	 });
-
-	 
-
 })
+//display list of all selected exams
+function selectedTest(callback){
+	$.ajax({
+		 url:"../cfc/studentHome.cfc",
+		 data: {
+			 method : "getTest"
+		},
+		type:"POST",
+		success: callback,
+		error: function(){
+			alert("AJAX error");
+			return false;
+		}
+	});
+}
+//callback function for selectedTest function
+function getTest(data){
+    displayTests(data);
+    
+    $('#examDisplayTable').DataTable( {
+    		
+    		"columnDefs": [
+    	        { type: 'date-dd-mmm-yyyy', targets: 1 }
+    	      ],
+    	      "aaSorting": [[1,'desc'],[2,'desc']]
+    });
+}
+
 //Function to display test list
 function displayTests(data){
 	$("#examDisplayTable > tbody").html("");
@@ -135,93 +136,54 @@ function displayTests(data){
         	tests[i][5]*100 +'%</b></td></tr>';
     	}
     	markup = markup+postMarkup;
-    	//'</td><td align="center"><input type="checkbox" name="optionSelector[]" value='+
-    	//tests[i][0] +' '+check+' ></td></tr>';
        	$("#examDisplayTable tbody").append(markup);
     	
-    } 
-    
-    
+    }  
 }
 
 //function to validate ongoing test by checking if test session exists
-function validateOngoingTest(){
-	var reloadCheck= 0;
+function validateOngoingTest(callback){
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
 			 method : "validateOngoingTest",
 			 testID : currentTestID
 		},
-		async:false,
 		type:"POST",
-		success: function(data){
-		console.log(data);
-		if(data == "true"){
-			return true;
-		}
-		else{
-			reloadCheck =1;
-			$('#myModal').modal('hide');
-			alert("Test session expired. Your response has been submitted");
-			
-		}
-		},
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
-	 if(reloadCheck == 1){
-		 location.reload();
-	 }
 	
+}
+//callback to validateOngoingTest
+function testSessionCheck(data){
+	console.log(data);
+	if(data == "true"){
+		return true;
+	}
+	else{
+		$('#myModal').modal('hide');
+		alert("Test session expired. Your response has been submitted");
+		location.reload();
+	}
 }
 
 //function to start test
-function displayExam(ID){
+function startExam(ID,callback){
     $("#onlineTestForm").html("");
     currentTestID = ID;
-    var testDuration;
+
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
 			 method : "checkTest",
 			 testID : ID
 		},
-		async:false,
 		type:"POST",
-		success: function(data){
-			console.log(data);
-			if(data == "false"){
-				alert("Please start test at mentioned Date");
-				return false;
-			}
-			else if(data =='"wrong time"'){
-				alert("Test can only be started at mentioned Time");
-				return false;
-			}
-			else if(data == '"empty test"'){
-				alert("Test is presently unavailable!!");
-				return false;
-			}
-			else{
-				var recievedData =  $.parseJSON(data);	
-				currentTestRowCount = recievedData;
-					$('#examNext').prop('disabled', false);
-					$('#examPrevious').prop('disabled', true);
-					currentTestRow=1;
-//start test
-					setTimeout(function(){
-						createTest();
-					    },800)
-					
-					testDuration = duration();
-//set timeout and display countdown
-					timer(testDuration);	
-				}		
-			
-		},
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
@@ -229,11 +191,46 @@ function displayExam(ID){
 	});
 }
 
+//callback to startExam
+function checkTest(data){
+    var testDuration;
+	console.log(data);
+	if(data == "false"){
+		alert("Please start test at mentioned Date");
+		return false;
+	}
+	else if(data =='"wrong time"'){
+		alert("Test can only be started at mentioned Time");
+		return false;
+	}
+	else if(data == '"empty test"'){
+		alert("Test is presently unavailable!!");
+		return false;
+	}
+	else{
+		var recievedData =  $.parseJSON(data);	
+		currentTestRowCount = recievedData;
+			$('#examNext').prop('disabled', false);
+			$('#examPrevious').prop('disabled', true);
+			currentTestRow=1;
+//start test
+			setTimeout(function(){
+				createTest(generateQuestion);
+			    },800)
+			
+			testDuration = duration();
+//set timeout and display countdown
+			timer(testDuration);	
+		}		
+	
+}
+
+
 //function to display test modal
-function createTest(){
-	var markup;
+function createTest(callback){
+	
 	$("#onlineTestForm").html("");
-	var questionRow;
+	
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
@@ -242,36 +239,38 @@ function createTest(){
 			 row : currentTestRow
 			 
 		},
-		async:false,
 		type:"POST",
-		success: function(data){
-			if(data == false){
-				return false;
-			}
-		
-		questionRow = $.parseJSON(data);
-		console.log(questionRow);
-		},
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
-    	markup = '<fieldset class="testFieldset"><input type="hidden" id="questionID" value="'
-    	+questionRow[0]+'"><p><i><b>'+questionRow[1]+
-    	'</b></i></p><hr><br><input type="radio" name="options" value = 1>'+questionRow[2]+
-    	'<br><input type="radio" name="options" value = 2>'+questionRow[3]+
-    	'<br><input type="radio" name="options" value = 3>'+questionRow[4]+
-    	'<br><input type="radio" name="options" value = 4>'+questionRow[5]+
-    	'<br></fieldset>';
-    	$("#onlineTestForm").append(markup);
-    	if(questionRow[6] > 0){
-    	$("input[name=options][value=" + questionRow[6] + "]").prop('checked', true);
-    	}
     	
-    	
-	    $('#myModal').modal('show');
  
+}
+//callback to createTest
+function generateQuestion(data){
+	var markup;
+	var questionRow;
+	if(data == 'false'){
+		return false;
+	}
+	questionRow = $.parseJSON(data);
+	markup = '<fieldset class="testFieldset"><input type="hidden" id="questionID" value="'
+	+questionRow[0]+'"><p><i><b>'+questionRow[1]+
+	'</b></i></p><hr><br><input type="radio" name="options" value = 1>'+questionRow[2]+
+	'<br><input type="radio" name="options" value = 2>'+questionRow[3]+
+	'<br><input type="radio" name="options" value = 3>'+questionRow[4]+
+	'<br><input type="radio" name="options" value = 4>'+questionRow[5]+
+	'<br></fieldset>';
+	$("#onlineTestForm").append(markup);
+	if(questionRow[6] > 0){
+	$("input[name=options][value=" + questionRow[6] + "]").prop('checked', true);
+	}
+	
+	
+    $('#myModal').modal('show');
 }
 
 //function to record users response
@@ -300,8 +299,8 @@ function saveResult(questionID,checked){
  
 }
 //function to calculate result
-function finalResult(){
-	var correct;
+function finalResult(callback){
+
 	 $.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
@@ -309,31 +308,35 @@ function finalResult(){
 			 testID : currentTestID
 		},
 		type:"POST",
-		async:false,
-		success: function(data){
-		console.log(data);
-		if(data == '"submitted"'){
-			return false;
-		}
-		
-		if(data=="false"){
-			alert("Submission Time out of bounds");
-			return false;
-		}
-		correct = $.parseJSON(data);
-		alert("your score : "+ correct + "/"+currentTestRowCount+"\n"+
-				"percentage :" + ((correct/currentTestRowCount)*100).toFixed(2) + "%" );
-		},
+
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
+	
 }
+//calback to finalResult
+function displayResult(data){
+	var correct;
+	console.log(data);
+	if(data == '"submitted"'){
+		return false;
+	}
+	
+	if(data=="false"){
+		alert("Submission Time out of bounds");
+		return false;
+	}
+	correct = $.parseJSON(data);
+	alert("your score : "+ correct + "/"+currentTestRowCount+"\n"+
+			"percentage :" + ((correct/currentTestRowCount)*100).toFixed(2) + "%" );
+	 location.reload();
+	}
 
 //function to get duration of selected test to set timer
 
-//get duration at test start for timer
 function duration(){
 	var currentTestDuration;
 	$.ajax({
@@ -357,7 +360,6 @@ function duration(){
 
 //function to start timer at test start and implement force submit when duration exceeds
 
-//function to start timer at test start. Clears interval and force submits test at exam end
 function timer(n){
 	
 	var dayNow = new Date();
@@ -399,7 +401,7 @@ function timer(n){
 	//close modal after submit
 		        $('#myModal').modal('hide');
 	//generate calculated result
-		        finalResult();
+		        finalResult(displayResult);
 	        
 	    }
 	}, 1000);

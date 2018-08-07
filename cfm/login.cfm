@@ -45,7 +45,7 @@
     <input type="text" name="user" id="user" placeholder="Email ID">
 	<span id="passwordError"></span>
     <input type="password" name="pass" id="password" placeholder="Password">
-    <input type="button" id="submitButton" name="login" class="login login-submit" value="login">
+    <input type="button" id="submitButton" name="login" class="login login-submit" value="Login">
   </form>
 
   <div class="login-help">

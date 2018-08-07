@@ -65,7 +65,6 @@ $(document).ready(function () {
 				 method : "getQuestion",
 				 questionID : extractedID
 			},
-			//async:false,
 			type:"POST",
 			success: function(data){
 			console.log(data);

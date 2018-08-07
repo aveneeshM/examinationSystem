@@ -7,27 +7,7 @@
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
 
-<!---   <cffunction name="testInfo" access="public" returntype="array">
-	<cftry>
-	<cfquery name="testInfoQuery" datasource="examinationSystem">
-          SELECT name FROM tests
-	</cfquery>
-		 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#
-					  Message: #message#" />
-		</cfcatch>
-		</cftry>
 
-	<cfset myarray=arraynew(1)>
-	<cfloop query = "testInfoQuery">
-    <cfset myarray[CurrentRow]=#name#>
-    </cfloop>
-    <cfreturn #myarray#/>
-  </cffunction> --->
 <!---add question to  database--->
   <cffunction name="addQuestion" access="remote" returntype="string" returnformat="JSON">
 	<cfargument name="question" type="string" required="true" >
@@ -41,7 +21,6 @@
 	<cfif NOT structKeyExists(session,"stLoggedInUser")>
 		<cfreturn "does not">
 	</cfif>
-	<!---><cfset var correctString = arrayToList(arguments.correct)>--->
 	<cftry>
 	<cfquery result="insertOptions" datasource="examinationSystem">
 			INSERT INTO questions

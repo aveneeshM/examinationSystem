@@ -20,22 +20,17 @@
 		      WHERE testStudent.testTakerID = <cfqueryparam value="#session.stLoggedInUser.userID#" cfsqltype="cf_sql_integer" />
 		      ORDER BY tests.startDate, tests.startTime DESC
 		   </cfquery>
-		   	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-		</cfcatch>
-		</cftry>
+
 		   <cfset testArray = arraynew(1)>
 
 		   <cfloop query="testAllQuery">
 			   <cfset var testResult = testAllQuery.result>
-			   <cfif #testAllQuery.startDate# GTE #DATEFORMAT(NOW(),"yyyy-mm-dd")#>
 			   <cfset var checkTimeWindow= TIMEFORMAT(DateAdd("n",59,testAllQuery.startTime),"HH:mm:ss")>
 
-		      <cfif TIMEFORMAT(Now(),"HH:mm:ss") GT #checkTimeWindow#>
+			   <cfif (DATEFORMAT(#testAllQuery.startDate#,"yyyy-mm-dd") LT DATEFORMAT(NOW(),"yyyy-mm-dd")) OR
+			         (DATEFORMAT(#testAllQuery.startDate#,"yyyy-mm-dd") EQ DATEFORMAT(NOW(),"yyyy-mm-dd") AND
+			         TIMEFORMAT(Now(),"HH:mm:ss") GT checkTimeWindow)>
+
 			     <cfif NOT len(testAllQuery.result)>
 			      <cfquery result="invalidTimeResultQuery" datasource="examinationSystem">
 		          UPDATE testStudent SET
@@ -46,7 +41,6 @@
 		         <cfset var testResult = 0>
 		       </cfif>
 		     </cfif>
-			 </cfif>
 
 		     <cfset testArray[#currentRow#] =[testAllQuery.testID,
 		                                      testAllQuery.name,
@@ -55,6 +49,14 @@
 		                                      TIMEFORMAT(testAllQuery.startTime,"HH:mm:ss"),testResult] />
 	       </cfloop>
 		   <cfreturn testArray>
+		   <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		</cfcatch>
+		</cftry>
 	   </cffunction>
 
 
@@ -215,7 +217,7 @@
 		   </cftry>
 
 
-		 <!--- If selected question has not been answered --->
+		 <!--- If selected question has not been answered before--->
 		 <cfif NOT structKeyExists(session.testData.testResponse, "#arguments.questionID#")>
 		   <cfif arguments.selectedOption eq resultQuery.isCorrect>
 			<cfset session.testData.correct = session.testData.correct + 1>

@@ -114,67 +114,8 @@
 	</cffunction>
 
 
-<!---
-	<cffunction name="testQuestion" access="remote" returnformat="JSON">
-	<cftry>
-		<cfquery name="questionAllQuery" datasource="examinationSystem">
-		select Q.questionDescription, Q.questionID from questions Q
-		 order by Q.questionID desc
-		 </cfquery>
-		 	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#
-					  Message: #message#" />
-		</cfcatch>
-		</cftry>
-		 <cfset questionArr = arraynew(1)>
-		 <cfloop query="questionAllQuery">
-			 <CFSET questionArray[#currentRow#] =["#questionAllQuery.questionID#",
-			 "#questionAllQuery.questionDescription#", "#arguments.testID#"] />
-		</cfloop>
-		 <cfreturn questionArray>
-	</cffunction>
-	<!---get test id and add questions--->
-	<cffunction name="addQuestionTest" access="remote" returntype="string" returnformat="JSON">
-	<cfargument name="questionIDs" type="string" required="true" >
-	<cfargument name="testName" type="string" required="true" >
-
-	<cfloop list="#arguments.questionIDs#" index="id">
-	<cftry>
-	<cfquery result="addQuestionTestQuery" datasource="examinationSystem">
-			insert into testQuestions
-			(
-			questionID,testID
-			)
-		    values
-		    (
-		    <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#id#" />,
-		    <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.testID#" />
-
-		    )
-	</cfquery>
-		 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cfset message="#cfcatch.cause.message#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#
-					  Message: #message#" />
-		</cfcatch>
-		</cftry>
-</cfloop>
-<cfreturn true/>
-	</cffunction>
---->
-
 <!---get list of all questions to add in the newly created test--->
 	<cffunction name="testQuestion" access="remote" returnformat="JSON">
-	 <cfargument name="testName" type="string" required="true" >
      <cftry>
      <cfquery name="questionAllQuery" datasource="examinationSystem">
 		SELECT questionDescription, questionID FROM questions

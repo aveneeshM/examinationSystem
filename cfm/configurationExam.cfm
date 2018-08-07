@@ -51,7 +51,7 @@
 	<div class="tableRow smallMargin">
 	  <div class="label left">
 		  <span>Test Name:&nbsp;</span></div>
-		  <span class="left smallMargin"><input type="text" id="testName" size="41" ></span>
+		  <span class="left smallMargin"><input type="text" id="testName" size="41" placeholder="Name"></span>
 		  <div class="label left smallMargin">
 		  <span>Test Duration:&nbsp;</span></div>
 		  <span class="left smallMargin"><input type="text" id="duration" size="41" placeholder="Hours" ></span>
@@ -60,10 +60,10 @@
 	<div class="tableRow smallMargin">
 	  <div class="label left">
 		  <span>Test Date:&nbsp;</span></div>
-		  <span class="left smallMargin"><input type="text" id="datetext" readonly="true" size="41" ></span>
+		  <span class="left smallMargin"><input type="text" id="datetext" readonly="true" size="41"  placeholder="Date"></span>
 		  <div class="label left smallMargin">
 		  <span>Start Time:&nbsp;</span></div>
-		  <span class="left smallMargin"><select id="timePicker" readonly="true" <!--->onchange="validateTime()"--->; ></select></span>
+		  <span class="left smallMargin"><select id="timePicker" readonly="true"></select></span>
 	</div>
 </div><br>
 <input type="button" name="button" id="button" class="login login-submit right addQuestionButton" value="Add Test">

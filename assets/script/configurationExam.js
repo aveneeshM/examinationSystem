@@ -1,72 +1,19 @@
 //global variable declaration
-var arrayTime, allTime, testNameCheck=1;
+var returnTime, allTime,testNameCheck;
 $(document).ready(function () {
-	//Submit button handler: checks if all fields are valid
-    $("#button").on("click", function () {
-        if($("#duration").val().length == 0 || $("#datetext").val().length == 0 ||
-        		$("#testName").val().length == 0 || $("#timePicker option:selected").text().length == 0 ){
-        	alert("All fields are required");
-        	return false;
-        }
-        else if(testNameCheck == 2){
-        	alert("Test name can contain words and numbers only");
-        	return false;
-        }
-        else if(testNameCheck == 0){
-        	alert("Existing Test. Choose a different test name");
-        	return false;
-        }
-        else{
-        	addTest();
-        	$.ajax({
-   			 url:"../cfc/configExam.cfc",
-   			 data: {
-   				 method : "testQuestion",
-   				 testName : $("#testName").val()
-   			},
-   			type:"POST",
-   			async:false,
-   			success: function(data){
-   			console.log(data);
-   		    displayQuestion(data);
-   			},
-   			error: function(){
-   				alert("AJAX error");
-   				return false;
-   			}
-   		}); 
-        	$("#addQuesForm")[0].reset();
-        	$("#timePicker").prop("selectedIndex", -1);
-        }
+	
+	$("#testName").on("blur", function (e) {
+        nameCheck();
     });
-    
-    
-    $("#timePicker").on("change", function(){
-		validateTime($("#timePicker").val());
-	})
-    
+	
 	$("#duration").on("change", function(){
 		$('#datetext').val("");
-		$("#timePicker").prop("selectedIndex", -1);
+		$('#timePicker').html("");
+		validateNumber("#duration");
 	})
 	
-	$("#duration").on("blur", function (e) {
-	     if($("#duration").val().length != 0){
-	         validateNumber("#duration");
-	         if($('#duration').val() == ""){
-	         	$('#datetext').prop('disabled', true);
-	         }
-	         else{
-	         	$('#datetext').prop('disabled', false);
-	         }
-	     }
-	});
-	//$('#timePicker').attr('disabled', 'enabled');
-	
 	$('#datetext').prop('disabled', true);
-	
-	$(function(){
-        $("#datetext").datepicker({
+    $("#datetext").datepicker({
             changeYear: true,
             dateFormat: 'yy/mm/dd',
             maxDate: '1y',
@@ -74,30 +21,34 @@ $(document).ready(function () {
             yearRange: '-100:+0',
             changeMonth: true,
             inline: true
-        });
-    });
-	
-	$("#testName").on("blur", function (e) {
-         nameCheck();
-            });
+     });
+    
+    $("#timePicker").on("change", function(){
+		validateTime($("#timePicker").val());
+	})
 	
 	$("#datetext").on("change", function (e) {
         if($('#datetext').val() == ""){
         	$('#timePicker').prop('disabled', true);
         }
         else{
+        	
         	$('#timePicker').html("");
-        	arrayTime = timeCheck();
+        	//set returnTime to available time slots
+
+        	timeCheck(timeChecker);
+        	
         	var option = '';
-            for(var i = 0; i < arrayTime.length; i++){
-                option += '<option value="' + arrayTime[i] + '">' + arrayTime[i] + '</option>';
+
+            for(var i = 0; i < returnTime.length; i++){
+                option += '<option value="' + returnTime[i] + '">' + returnTime[i] + '</option>';
             }
             $("#timePicker").append(option).prop("selectedIndex", -1);
         	$('#timePicker').prop('disabled', false);
         }
      });
 
-	
+//Question selection modal	
 	$('#quesSubmit').click(function(e) {
 		var checked = [];
         $(':checkbox:checked').each(function(i){
@@ -112,7 +63,6 @@ $(document).ready(function () {
 				 questionIDs : checked.join()
 			},
 			type:"POST",
-			//async : false,
 			success: function(data){
 			if(data == "true"){
 				
@@ -138,30 +88,66 @@ $(document).ready(function () {
 	
 	
 	
-	
-    
-});
+	//Submit button handler: checks if all fields are valid
+    $("#button").on("click", function () {
+        if($("#duration").val().length == 0 || $("#datetext").val().length == 0 ||
+        		$("#testName").val().length == 0 || $("#timePicker").val() == null ){
+        	alert("All fields are required");
+        	return false;
+        }
+        if(!nameCheck){
 
+        	return false;
+        }
+        if(testNameCheck == 0){
+        	alert("Existing test. Choose a different name.");
+        	return false;
+        }
+        if(!validateNumber("#duration")){
 
+        	return false;
+        }
+        
+        addTest();
+        displayQuestion(addQuestions);
+        	
+        $("#addQuesForm")[0].reset();
+        $("#timePicker").prop("selectedIndex", -1);
+
+    });
+        
+});//.ready closes
+
+//functon to validate name
 function nameCheck() {
 	
+    
 	var patt = /^[a-zA-Z0-9 ]+$/;
-    if ($("#testName").val().match(patt)) {
-    	$("#testName").css("border", "1px solid #a9a9a9");
-    	testNameCheck = 1;
-            
-    }
-    else if($("#testName").val() == ""){
+    
+    if($("#testName").val() == ""){
     	$("#testName").css("border", "1px solid #ff0000");
+    	$('#datetext').prop('disabled', true);
             return false;    	
+    }
+    else if ($("#testName").val().match(patt)) {
+    	nameExists(nameChecker);
+    	$("#testName").css("border", "1px solid #a9a9a9");
+    	$('#datetext').prop('disabled', false);
+    	return true;
+            
     }
     else {
     	$("#testName").css("border", "1px solid #ff0000");
-    	testNameCheck = 2;
             alert("Please use alphabets and numbers only.");
+            $('#datetext').prop('disabled', true);
             return false;
     }
-	
+
+
+}
+//function to check if name already exixts
+function nameExists(callback){
+
 	$.ajax({
 		 url:"../cfc/configExam.cfc",
 		 data: {
@@ -169,58 +155,54 @@ function nameCheck() {
 			 name : $("#testName").val(),
 
 		},
-		async: false,
 		type:"POST",
-		success: function(data){
-			console.log(data);
-
-		if(data == "true"){
-
-	        $(testName).css("border","1px solid #a9a9a9");
-	        testNameCheck = 1;
-        }
-		else{
-	        $(testName).css("border","1px solid #ff0000");
-	        testNameCheck = 0;
-	        alert("Existing test. Choose a different name.");
-
-		}
-		},
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
+}
+//callback to nameExists
+function nameChecker(data){
 
+if(data == "true"){
+    $(testName).css("border","1px solid #a9a9a9");
+    testNameCheck = 1;
+}
+else{
+    $(testName).css("border","1px solid #ff0000");
+    testNameCheck = 0;
+    alert("Existing test. Choose a different name.");
 
 }
+}
 
-function timeCheck() {
-	var returnTime;
-	var presentTS = new Date();
-	var timeIndex;
-	var date = $.datepicker.formatDate('yy/mm/dd',presentTS);
+//get all selected time slots for the date
+function timeCheck(callback) {
 	
 	$.ajax({
 		 url:"../cfc/configExam.cfc",
 		 data: {
 			 method : "timeChecker",
-			 date :  $("#datetext").val(),
-
+			 date :  $("#datetext").val()
 		},
-
 		type:"POST",
 		async:false,
-		success: function(data){
-			returnTime=data;
-		},
+		success: callback,
 		error: function(e){
 			alert(e+"AJAX error");
 			return false;
-		}
-		
+		}	
 	});
-	
+ }
+
+//callback to timeCheck. set available time slots to returnTime
+function timeChecker(data){
+    returnTime = data;
+	var presentTS = new Date();
+	var timeIndex;
+	var date = $.datepicker.formatDate('yy/mm/dd',presentTS);
 	allTime=["00:00:00","01:00:00","02:00:00","03:00:00","04:00:00","05:00:00","06:00:00","07:00:00",
 		"08:00:00","09:00:00","10:00:00","11:00:00","12:00:00","13:00:00","14:00:00",
 		"15:00:00","16:00:00","17:00:00","18:00:00","19:00:00","20:00:00","21:00:00",
@@ -241,31 +223,8 @@ function timeCheck() {
 			});
 		returnTime = returnTime.slice(timeIndex+1);
 	}
-	
-	
-	
-	return returnTime;
-
 }
-
-function validateTime(selectedTime){
-var duration =$("#duration").val();
-var index=(allTime.indexOf(selectedTime)+(duration-1))%allTime.length;
-console.log($.inArray(arrayTime, allTime[index]));
-console.log(arrayTime);
-
-
-   if(arrayTime.includes(allTime[index])){
-	    return true;
-     }
-   else{
-	   alert("Time slot clashing with another test. Choose a different time slot ");
-	     $("#timePicker").prop("selectedIndex", -1);
-     }
-
-}
-
-
+//function to add test to database
 function addTest() {
 	$.ajax({
 		 url:"../cfc/configExam.cfc",
@@ -296,25 +255,57 @@ function validateNumber(number) {
     var length = $(number).val().length;
         var numbers =/^\d{1}$/;
         if ($(number).val() > 0 && $(number).val().match(numbers)) {
+        	$('#datetext').prop('disabled', false);
             $(number).css("border", "1px solid #ccc");
-            $(':input[type="button"]').prop('disabled', false);
+           return true;
         }
         else if($(number).val() > 10){
-        	$("#duration").val("");
+        	$('#datetext').prop('disabled', true);
         	alert("test duration can be at max of 9 hours");
-        	$(':input[type="button"]').prop('disabled', true);
+        	return false;
         }
         else {
+        	$('#datetext').prop('disabled', true);
         	$(number).css("border", "1px solid #ff0000");
-        	$("#duration").val("");
-        	alert("Please enter valid input. ");
-        	$(':input[type="button"]').prop('disabled', true);
+        	alert("Please enter valid input ");
+        	return false;
         }
     
 }
 
+function validateTime(selectedTime){
+	var duration =$("#duration").val();
+	var index=(allTime.indexOf(selectedTime)+(duration-1))%allTime.length;
+
+	   if(returnTime.includes(allTime[index])){
+		    return true;
+	     }
+	   else{
+		   alert("Time slot clashing with another test. Choose a different time slot ");
+		     $("#timePicker").prop("selectedIndex", -1);
+		     return false;
+	     }
+
+	}
+
+//get Questions for addQuestion modal
+function displayQuestion(callback){
+$.ajax({
+		 url:"../cfc/configExam.cfc",
+		 data: {
+			 method : "testQuestion"
+		},
+		type:"POST",
+		success: callback,
+		error: function(){
+			alert("AJAX error");
+			return false;
+		}
+	}); 
+}
+
 //function to open modal for question addition to the currently updated test
-function displayQuestion(data){
+function addQuestions(data){
 	
 	   var question = $.parseJSON(data);
 	   $("#questionSelectTable > tbody").html("");
