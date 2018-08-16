@@ -3,13 +3,28 @@ var optionArray=[];
 $(document).ready(function () {
 //Handler for submit button		   
 	   $("#button").on("click", function () {
-	        if($("#question").val().length == 0 || $("#option1").val().length == 0 ||
-	        		$("#option2").val().length == 0 || $("#option3").val().length == 0 || $("#option4").val().length == 0){
+	        if($.trim($("#question").val()).length == 0 || $.trim($("#option1").val()).length == 0 ||
+	        		$.trim($("#option2").val()).length == 0 || $.trim($("#option3").val()).length == 0 ||
+	        		$.trim($("#option4").val()).length == 0){
 	        	alert("All fields are required");
 	        	return false;
 	        }
+	        
 	        else{
 	        	var val = 0;
+	        	var options = [];
+	        	$('input[type=text]').each(function () {
+	                options.push($.trim($(this).val()))
+	            });
+	        	options= options.sort();
+	        	for (var i = 0; i < options.length - 1; i++) {
+	                if (options[i + 1].toLowerCase() == options[i].toLowerCase()) {
+	                    alert("Please enter different value for each option.");
+	                    return false;
+	                }
+	            }
+	        	
+	        	
 	          //  $(':checkbox:checked').each(function(i){
 	        	$(':radio:checked').each(function(i){
 	            	  val=1;
@@ -32,12 +47,12 @@ function addQuestion() {
 		 url:"../cfc/configQuestion.cfc",
 		 data: {
 			 method : "addQuestion",
-			 question : $("#question").val(),
-			 opt1 : $("#option1").val(),
-			 opt2 : $("#option2").val(),
-			 opt3 : $("#option3").val(),
-			 opt4 : $("#option4").val(),
-			 level : $("#level").val(),
+			 question : $.trim($("#question").val()),
+			 opt1 : $.trim($("#option1").val()),
+			 opt2 : $.trim($("#option2").val()),
+			 opt3 : $.trim($("#option3").val()),
+			 opt4 : $.trim($("#option4").val()),
+			 level : $.trim($("#level").val()),
 			 correct : optionArray.join()
 		},
 		type:"POST",

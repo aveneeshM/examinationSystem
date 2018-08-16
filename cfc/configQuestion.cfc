@@ -17,11 +17,11 @@
 	<cfargument name="opt4" type="string" required="true" >
 	<cfargument name="level" type="string" required="true" >
 	<cfargument name="correct" type="string" required="true" >
+	<cftry>
 
 	<cfif NOT structKeyExists(session,"stLoggedInUser")>
 		<cfreturn "does not">
 	</cfif>
-	<cftry>
 	<cfquery result="insertOptions" datasource="examinationSystem">
 			INSERT INTO questions
 			(
@@ -40,12 +40,13 @@
 		    )
 	</cfquery>
 	<cfreturn true/>
-		 <cfcatch type = "any">
+	<cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
   </cffunction>

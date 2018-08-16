@@ -12,7 +12,7 @@
 	<cfdocumentitem type="header">
 		    <h1 style="text-align:center;margin-top:40pt;font-size:200pt;">Examination Questions</h1>
 		</cfdocumentitem>
-   <table id="pdfTable" style="width:100%;text-align:center;border: 1px solid black;" cellspacing="0" cellpadding="0">
+   <table id="pdfTable" style="width:100%;text-align:center;border: 1px solid black;" cellspacing="0">
 	<tr>
 		               <th style="border-right: 1px solid black; background-color:lightgray;padding:4px 6px 4px 6px;">ID</th>
                         <th style="border-right: 1px solid black; background-color:lightgray;padding:4px 6px 4px 6px;">Question</th>

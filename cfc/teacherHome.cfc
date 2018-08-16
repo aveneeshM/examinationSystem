@@ -39,21 +39,25 @@
 		         isActive FROM questions
 		  ORDER BY createdDate DESC
 	    </cfquery>
-	    	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
+        <cfreturn #questionAllQuery#>
+		<cfcatch type = "any">
+		<cfset type="#cfcatch.Type#" />
+		<cflog type="Error"
+			file="examSystemLogs"
+			text="Exception error --
+				   	 Exception type: #type#
+				   	 ,Message:#cfcatch.Message#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
-        <cfreturn #questionAllQuery#>
 	</cffunction>
 
-<!---Function to return all questions --->
+<!---Function to return selected question --->
 	<cffunction name="getQuestion" access="remote" returnformat="JSON">
 	    <cfargument name="questionID" type="string" required="true" >
+
 	    <cftry>
+
 		<cfquery name="getQuestionQuery" datasource="examinationSystem">
 		  SELECT questionDescription,
 		         questionID,
@@ -66,20 +70,23 @@
 		  FROM questions
 		  WHERE questionID = <cfqueryparam value="#arguments.questionID#" cfsqltype="cf_sql_integer" />
 	    </cfquery>
-	    	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-		</cfcatch>
-		</cftry>
 		<cfset questionArr = arraynew(1)>
 		<cfset questionArr =["#getQuestionQuery.questionID#", "#getQuestionQuery.questionDescription#",
 			                 "#getQuestionQuery.option1#","#getQuestionQuery.option2#",
 			                 "#getQuestionQuery.option3#", "#getQuestionQuery.option4#",
 			                 "#getQuestionQuery.isCorrect#","#getQuestionQuery.isActive#"] />
 		<cfreturn questionArr>
+		<cfcatch type = "any">
+		<cfset type="#cfcatch.Type#" />
+		<cflog type="Error"
+			file="examSystemLogs"
+			text="Exception error --
+				   	 Exception type: #type#
+				   	 ,Message:#cfcatch.Message#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
+
 	</cffunction>
 
 <!---Function to save edited changes --->
@@ -94,16 +101,17 @@
 		    isActive = <cfqueryparam cfsqltype="CF_SQL_bit" value="#arguments.status#" />
         WHERE questionID =<cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.questionID#" />
 	  </cfquery>
-	  	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
+      <cfreturn true/>
+	<cfcatch type = "any">
+		<cfset type="#cfcatch.Type#" />
+		<cflog type="Error"
+			file="examSystemLogs"
+			text="Exception error --
+				   	 Exception type: #type#
+				   	 ,Message:#cfcatch.Message#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
-
-      <cfreturn true/>
 	</cffunction>
 
 

@@ -29,6 +29,7 @@
 		</div>
 <!--header end -->
 <!--Log-in area-->
+
 	<cfif structKeyExists(session,"stLoggedInUser")>
 		<cfif isUserInRole('teacher')>
 			<cflocation url="teacherHome.cfm" addtoken="no">

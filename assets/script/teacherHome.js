@@ -1,5 +1,6 @@
+var table;
 $(document).ready(function () {
-	$('#questionSelectTable').DataTable({
+	table = $('#questionSelectTable').DataTable({
 		"aaSorting": [1,'desc'],
 //allign elements at centre
 		"columnDefs": [
@@ -19,14 +20,15 @@ $(document).ready(function () {
 	                pageSize: 'LEGAL'
 	            }
 	        ],
+	      
 	        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
                 if ( aData[0] == "Inactive" )
                 {
-                    $('td', nRow).css('background-color', 'pink');
+                    $('td', nRow).css('background-color', '#ff9999');
                 }
                 else if ( aData[0] == "Active" )
                 {
-                    $('td', nRow).css('background-color', 'lightgreen');
+                    $('td', nRow).css('background-color', '#95D48A');
                 }
             }
 	});
@@ -40,19 +42,21 @@ $(document).ready(function () {
 	});
 	
 	//select active/inactive/all questions
-	$('.questionStatus input[type="checkbox"]').on('change', function() {
+	$('.questionStatus input[type="radio"]').on('change', function() {
+		
+		
 		   $(this).siblings('input[type="checkbox"]').prop('checked', false);
 		   if($(this).val()=="all"){
-			   $(".active").show();
-			   $(".inactive").show();			   
+               table.column(0).search("active")
+               .draw();		   
 		   }
 		   else if($(this).val()=="active"){
-			   $(".active").show();
-			   $(".inactive").hide();		   
+			   table.column(0).search("^" + "active" + "$", true, false, true)
+               .draw();
 		   }
 		   else{
-			   $(".active").hide();
-			   $(".inactive").show();
+			   table.column(0).search("^" + "inactive" + "$", true, false, true)
+               .draw();
 		   }
 		});
 	
@@ -109,10 +113,9 @@ $(document).ready(function () {
 				return false;
 	        }
 			else{
-				//setInterval(function(){$('#myModal').modal('hide'); }, 100);
+				
 
 				$('#myModal').modal('hide');
-				//location.reload(true);
 				setInterval(function(){location.reload(true); }, 400);
 				
 	        }

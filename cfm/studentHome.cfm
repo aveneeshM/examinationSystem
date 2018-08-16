@@ -1,16 +1,19 @@
 
-<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+<cfif NOT isUserLoggedIn()>
 	<cflocation url="login.cfm" addtoken="no">
-	<cfelse>
-	<cfif session.stLoggedInUser.designation EQ "teacher">
+<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
+    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
+    <cfset logOutObj.doLogOut() />
+	<cflocation url="login.cfm" addtoken="no">
+<cfelseif session.stLoggedInUser.designation EQ "teacher">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-	</cfif>
-</cfif>
+<cfelse>
+
 <cfif structKeyExists(session,"testData")>
 <cfset saveDeleteObj = CreateObject("Component", "examinationSystem.cfc.studentHome") />
 <cfset saveDeleteObj.submitStopTest() />
 <cflocation url="studentHome.cfm" addtoken="no">
-	<!--- <cfabort showError = "Test interrupted. reload"> --->
+
 
 </cfif>
 <html>
@@ -94,3 +97,4 @@
 </div>
 </body>
 </html>
+</cfif>

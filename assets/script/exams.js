@@ -1,3 +1,4 @@
+var table;
 $(document).ready(function () {
 
 //Add datatable to created exam table	
@@ -32,12 +33,16 @@ $(document).ready(function () {
 		    	}
 		    displayQuestion(data);
 		    
-		    $('#questionSelectTable').DataTable({
+		    table = $('#questionSelectTable').DataTable({
 				    	"columns": [
 				            null,
 				            { "orderDataType": "dom-checkbox" }
 				        ],
 				        "aaSorting": [[1,'desc'],[0,'asc']],
+				        //"paging":false,
+				 	    //"scrollY":"420px",
+				 	    //"scrollCollapse": true,
+
 				        });
 			},
 			error: function(){
@@ -50,7 +55,7 @@ $(document).ready(function () {
 //event handler to Question Submit button
 	$('#quesSubmit').click(function(e) {
 		var checked = [];
-        $(':checkbox:checked').each(function(i){
+        table.$(':checkbox:checked').each(function(i){
       	  checked[i]=$(this).val();
         
       });

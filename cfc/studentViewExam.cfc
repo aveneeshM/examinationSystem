@@ -28,16 +28,6 @@
 		      testTakerID = <cfqueryparam cfsqltype = "CF_SQL_INTEGER" value = "#session.stLoggedInUser.userID#" />)
 		      ORDER BY startDate, startTime DESC
 		   </cfquery>
-		   <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#
-					  Message: #message#" />
-		  </cfcatch>
-		  </cftry>
-
 
 		   <cfset var testArray = arraynew(1)>
 		   <cfset var arrayCounter = 1>
@@ -57,6 +47,16 @@
 		   </cfif>
 	       </cfloop>
 		  <cfreturn testArray>
+		  	<cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#
+				   	  ,Message:#cfcatch.Message#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 	   </cffunction>
 
 <!---Add selected test to testStudent table--->
@@ -74,12 +74,14 @@
             <cfqueryparam cfsqltype = "CF_SQL_VARCHAR" value= "#session.stLoggedInUser.userID#" />
 		    )
 		   </cfquery>
-		   	 <cfcatch type = "any">
+	        <cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
-				   	  Exception type: #type#" />
+				   	  Exception type: #type#
+				   	  ,Message:#cfcatch.Message#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
 	</cffunction>

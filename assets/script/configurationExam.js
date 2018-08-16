@@ -1,6 +1,23 @@
 //global variable declaration
-var returnTime, allTime,testNameCheck;
+var returnTime, allTime,testNameCheck,test;
 $(document).ready(function () {
+	
+	//List of Exams Table
+	$('#examSelectTable').DataTable({
+		info:false,
+		"aaSorting": [5,'desc'],
+		"columnDefs": [
+	        {"className": "dt-center", "targets": "_all"},
+	        { type: 'date-dd-mmm-yyyy', targets: [2,5] }
+	      ],
+	      
+	});
+	
+	$( "#examHeading" ).on("click",function() {
+		  $( "div.ExamTable" ).toggle( "slow");
+		});
+	
+	
 	
 	$("#testName").on("blur", function (e) {
         nameCheck();
@@ -34,24 +51,17 @@ $(document).ready(function () {
         else{
         	
         	$('#timePicker').html("");
-        	//set returnTime to available time slots
-
+       //Display available time slots for the day. set returnTime to available time slots
         	timeCheck(timeChecker);
         	
-        	var option = '';
-
-            for(var i = 0; i < returnTime.length; i++){
-                option += '<option value="' + returnTime[i] + '">' + returnTime[i] + '</option>';
-            }
-            $("#timePicker").append(option).prop("selectedIndex", -1);
-        	$('#timePicker').prop('disabled', false);
+        	
         }
      });
 
-//Question selection modal	
+//Question selection modal on submit
 	$('#quesSubmit').click(function(e) {
 		var checked = [];
-        $(':checkbox:checked').each(function(i){
+        test.$(':checkbox:checked').each(function(i){
       	  checked[i]=$(this).val();
         
       });
@@ -69,6 +79,9 @@ $(document).ready(function () {
 				console.log(data);
 				$('#myModal').modal('hide');
 				$("#testQuesForm")[0].reset();
+				$("#addQuesForm")[0].reset();
+			    $("#timePicker").prop("selectedIndex", -1);
+				setTimeout(function(){ location.reload() }, 600);
 	        }
 			else{
 				console.log(data);
@@ -88,14 +101,14 @@ $(document).ready(function () {
 	
 	
 	
-	//Submit button handler: checks if all fields are valid
+	//Add test submit button handler: checks if all fields are valid
     $("#button").on("click", function () {
         if($("#duration").val().length == 0 || $("#datetext").val().length == 0 ||
         		$("#testName").val().length == 0 || $("#timePicker").val() == null ){
         	alert("All fields are required");
         	return false;
         }
-        if(!nameCheck){
+        if(!nameCheck()){
 
         	return false;
         }
@@ -108,12 +121,7 @@ $(document).ready(function () {
         	return false;
         }
         
-        addTest();
-        displayQuestion(addQuestions);
-        	
-        $("#addQuesForm")[0].reset();
-        $("#timePicker").prop("selectedIndex", -1);
-
+        addTest(displayTest);
     });
         
 });//.ready closes
@@ -128,6 +136,11 @@ function nameCheck() {
     	$("#testName").css("border", "1px solid #ff0000");
     	$('#datetext').prop('disabled', true);
             return false;    	
+    }
+    else if(/^[ \s]+|[ \s]+$/.test($("#testName").val())){
+    	 alert("Do not use leading and trailing spaces in Test Name");
+         $('#datetext').prop('disabled', true);
+         return false;
     }
     else if ($("#testName").val().match(patt)) {
     	nameExists(nameChecker);
@@ -188,7 +201,6 @@ function timeCheck(callback) {
 			 date :  $("#datetext").val()
 		},
 		type:"POST",
-		async:false,
 		success: callback,
 		error: function(e){
 			alert(e+"AJAX error");
@@ -197,7 +209,7 @@ function timeCheck(callback) {
 	});
  }
 
-//callback to timeCheck. set available time slots to returnTime
+//callback to timeCheck. set all available time slots to returnTime
 function timeChecker(data){
     returnTime = data;
 	var presentTS = new Date();
@@ -223,9 +235,18 @@ function timeChecker(data){
 			});
 		returnTime = returnTime.slice(timeIndex+1);
 	}
+	var option = '';
+
+    for(var i = 0; i < returnTime.length; i++){
+        option += '<option value="' + returnTime[i] + '">' + returnTime[i] + '</option>';
+    }
+    $("#timePicker").append(option).prop("selectedIndex", -1);
+	$('#timePicker').prop('disabled', false);
+	
+	
 }
 //function to add test to database
-function addTest() {
+function addTest(callback) {
 	$.ajax({
 		 url:"../cfc/configExam.cfc",
 		 data: {
@@ -237,11 +258,7 @@ function addTest() {
 
 		},
 		type:"POST",
-		async : false,
-		success: function(data){
-			console.log(data);
-            alert("exam added");
-		},
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
@@ -249,6 +266,13 @@ function addTest() {
 	});
 
 
+}
+//callback to function addTest
+function displayTest(data){
+	console.log(data);
+    alert("exam added");
+    displayQuestion(addQuestions)
+    //$(".examTable").show("slow");
 }
 //function to validate duration
 function validateNumber(number) {
@@ -272,21 +296,26 @@ function validateNumber(number) {
         }
     
 }
-
+//Executed when time is changed
+//function to validate if chosen time+duration does not clashes with any other test
 function validateTime(selectedTime){
 	var duration =$("#duration").val();
-	var index=(allTime.indexOf(selectedTime)+(duration-1))%allTime.length;
-
-	   if(returnTime.includes(allTime[index])){
-		    return true;
+		
+	for( var i = 1; i< duration; i++ ){
+		var index=allTime.indexOf(selectedTime)+i;
+		if(index == allTime.length){
+			alert("Selected time and duration are exceeding available hours!!\n"+
+					"Please resubmit.");
+		    $("#timePicker").prop("selectedIndex", -1);
+		    break;
 	     }
-	   else{
-		   alert("Time slot clashing with another test. Choose a different time slot ");
-		     $("#timePicker").prop("selectedIndex", -1);
-		     return false;
+		if(!returnTime.includes(allTime[index])){
+			alert("Time slot clashing with another test. Choose a different time slot ");
+		    $("#timePicker").prop("selectedIndex", -1);
+		    break;
 	     }
-
 	}
+}
 
 //get Questions for addQuestion modal
 function displayQuestion(callback){
@@ -313,11 +342,12 @@ function addQuestions(data){
 	    	var markup = '<tr><td align="center">' + question[i][1] + 
 	    	'</td><td align="center"><input type="checkbox" name="questionSelector[]" value='+
 	    	question[i][0]+'></td></tr>';
-	    	$("#questionSelectTable tbody").append(markup);
-	    	$('#myModal').modal('show'); 
+	    	$("#questionSelectTable tbody").append(markup); 
 	    }
+	    $('#myModal').modal('show');
 	    $('#testID').val(question[1][2]);
-	    $('#questionSelectTable').DataTable();
+	    test = $('#questionSelectTable').DataTable();
+	    
 	}
 
 //string prototype function to replaceAt given index with given replacement on a string 

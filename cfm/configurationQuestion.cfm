@@ -1,11 +1,12 @@
-
-<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+<cfif NOT isUserLoggedIn()>
 	<cflocation url="login.cfm" addtoken="no">
-	<cfelse>
-	<cfif session.stLoggedInUser.designation EQ "student">
+<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
+    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
+    <cfset logOutObj.doLogOut() />
+	<cflocation url="login.cfm" addtoken="no">
+<cfelseif session.stLoggedInUser.designation EQ "student">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-	</cfif>
-</cfif>
+<cfelse>
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -20,7 +21,7 @@
 		<div id="header" >
 	<!--logo -->
 		    <div class="logo">
-		    	<a href="login.cfc">
+		    	<a href="login.cfm">
 				<img src="../assets/images/logo2.png" alt="Logo" width="80" height="70" border="0"  id="logo" /></a>
 				<b>Online Examination System</b>
 			</div>
@@ -35,6 +36,7 @@
 			</div>
 		</div>
 <!--header end -->
+<h3 class="configHeading">Create Question</h3>
 <div id="addQuestions">
 <form class="addQuesForm" id="addQuesForm" method="POST">
 
@@ -45,25 +47,25 @@
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>1<sup>st</sup> Option:&nbsp;</span>
-	  </div><textarea rows="1" cols="50" id="option1"></textarea>
+	  </div> <input type="text" id="option1" size="60">
 	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox1" value="1">Correct</label></span>
 	</div><br>
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>2<sup>nd</sup> Option:&nbsp;</span>
-	  </div><textarea rows="1" cols="50" id="option2"></textarea>
+	  </div> <input type="text" id="option2" size="60">
 	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox2" value="2">Correct</label></span>
 	</div><br>
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>3<sup>rd</sup> Option:&nbsp;</span>
-	  </div><textarea rows="1" cols="50" id="option3"></textarea>
+	  </div> <input type="text" id="option3" size="60">
 	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox3" value="3">Correct</label></span>
 	</div><br>
 	<div class="tableRow">
 	  <div class="label left">
 		  <span>4<sup>th</sup> Option:&nbsp;</span>
-	  </div><textarea rows="1" cols="50" id="option4"></textarea>
+	  </div> <input type="text" id="option4" size="60">
 	   <span class="checkBox"><label><input type="radio" name="optionSelector" id="ad_Checkbox4" value="4">Correct</label></span>
 	</div><br><br><br>
 <br>
@@ -82,3 +84,4 @@
 
 </body>
 </html>
+</cfif>

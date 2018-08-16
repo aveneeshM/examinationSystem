@@ -1,11 +1,12 @@
-
-<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+<cfif NOT isUserLoggedIn()>
 	<cflocation url="login.cfm" addtoken="no">
-	<cfelse>
-	<cfif session.stLoggedInUser.designation EQ "student">
+<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
+    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
+    <cfset logOutObj.doLogOut() />
+	<cflocation url="login.cfm" addtoken="no">
+<cfelseif session.stLoggedInUser.designation EQ "student">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-	</cfif>
-</cfif>
+<cfelse>
 
 <html>
 <head>
@@ -49,9 +50,9 @@
 <!---header end --->
 <div class="questionStatus">
 	<h3>Question Type</h3><br>
-	<input type="checkbox" class="checkbox1" name="questionSelector" value='active'>&nbsp;Active<br>
-	<input type="checkbox" class="checkbox1" name="questionSelector" value='inactive'>&nbsp;Inactive<br>
-	<input type="checkbox" class="checkbox1" name="questionSelector" value='all' checked='true'>&nbsp;All<br>
+	<label><input type="radio" class="checkbox1" name="questionSelector" value='active'>&nbsp;Active</label><br>
+	<label><input type="radio" class="checkbox1" name="questionSelector" value='inactive'>&nbsp;Inactive</label><br>
+	<label><input type="radio" class="checkbox1" name="questionSelector" value='all' checked='true'>&nbsp;All</label><br>
 </div>
 <div class="questionList">
 <cfset teacherObj = CreateObject("Component", "examinationSystem.cfc.teacherHome") />
@@ -148,3 +149,4 @@
 
 </body>
 </html>
+</cfif>

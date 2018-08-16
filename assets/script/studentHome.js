@@ -13,7 +13,7 @@ $(document).ready(function () {
 	 $('#examDisplayTable').on('click', '.modalOpener', function(e){
 	 //$(".modalOpener").on("click", function(e){
 	        e.preventDefault();
-//Function call to start exam
+     //Function call to start exam
 	        startExam($(this).val(),checkTest);
 	    });
 	 
@@ -21,15 +21,15 @@ $(document).ready(function () {
 //next question button response
 	 $("#examNext").on("click", function(e){
 		 validateOngoingTest(testSessionCheck);
-//disable next button for last question
+     //disable next button for last question
 		 if(currentTestRow == currentTestRowCount-1){
 				$('#examNext').prop('disabled', true);
 		 }
-//enable previous button after test start
+     //enable previous button after test start
 		 if(currentTestRow == 1){
 				$('#examPrevious').prop('disabled', false);
 		 }
-//store user's response for the question
+     //store user's response for the question
 		 var questionID = $("#questionID").val();
 		 var checked = [];
 	        $(':radio:checked').each(function(i){
@@ -37,7 +37,7 @@ $(document).ready(function () {
 	        });
 		 currentTestRow+=1;
 		 saveResult(questionID,checked.join());
-//function call to display next question
+     //function call to display next question
 		 createTest(generateQuestion);
 	 });
 	 
@@ -46,15 +46,15 @@ $(document).ready(function () {
 //previous question button response
 	 $("#examPrevious").on("click", function(e){
 		 validateOngoingTest(testSessionCheck);
-//disable previous button for first question 
+     //disable previous button for first question 
 		 if(currentTestRow == 2){
 				$('#examPrevious').prop('disabled', true);
 		 }
-//enable next button when browsing back from last question
+    //enable next button when browsing back from last question
 		 if(currentTestRow == currentTestRowCount){
 				$('#examNext').prop('disabled', false);
 		 }
-//store user's response for the question
+    //store user's response for the question
 		 var questionID = $("#questionID").val();
 		 var checked = [];
 	        $(':radio:checked').each(function(i){
@@ -62,7 +62,7 @@ $(document).ready(function () {
 	        });
 		 currentTestRow-=1;
 		 saveResult(questionID,checked.join());
-//function call to display next question
+    //function call to display next question
 		 createTest(generateQuestion);
 	 });
 	 
@@ -75,9 +75,9 @@ $(document).ready(function () {
 	      	  checked[i]=$(this).val();
 	        });
 	        saveResult(questionID,checked.join());
-//close modal after submit
+    //close modal after submit
 	        $('#myModal').modal('hide');
-//generate calculated result
+    //generate calculated result
 	        finalResult(displayResult);
 	        
 		 
@@ -115,17 +115,38 @@ function getTest(data){
 function displayTests(data){
 	$("#examDisplayTable > tbody").html("");
 	var check="";
+	var date=new Date();
+	var presentTest = "";
+	var presentDate, presentTime, parsedDate;
     tests = $.parseJSON(data);
-    console.log(tests);
+    //get present date and time to alert for upcoming test
+    presentDate = date.getFullYear() + "-" + getFormattedPartTime(date.getMonth()+1) + 
+                  "-" + getFormattedPartTime(date.getDate());
+
+    presentTime = getFormattedPartTime(date.getHours()) + ":" + 
+                  getFormattedPartTime(date.getMinutes()) + ":" +
+                  getFormattedPartTime(date.getSeconds());
+ 
 
 
    	for(var i=0; i<tests.length;i++){
-
+   		//get parsed start date to validate with present date for start test alert
+   		parsedDate = new Date(tests[i][3]);
+   		parsedDate = parsedDate.getFullYear() + "-" + getFormattedPartTime(parsedDate.getMonth()+1) + 
+                     "-" + getFormattedPartTime(parsedDate.getDate());
+   		
+   		if(presentDate == parsedDate && presentTime >= tests[i][4]){
+   		  if((date.getMinutes()-15) <= 0 && tests[i][5] == ''){
+   			 presentTest = tests[i][1];
+   		  }
+   	    }
+   		 
     	var markup = '<tr id="'+tests[i][0]+'"><td align="center">'+ tests[i][1]+
     	'</td><td align="center">'+ tests[i][3]+
     	'</td><td align="center">'+tests[i][4]+
     	'</td>';
     	var postMarkup = '';
+    	//assign start-button/test-result to each test
     	if(tests[i][5] == ''){
     		postMarkup = '<td align="center"><button class= "modalOpener" value='+
         	tests[i][0] +'>Start</button></td></tr>';
@@ -138,8 +159,12 @@ function displayTests(data){
     	markup = markup+postMarkup;
        	$("#examDisplayTable tbody").append(markup);
     	
-    }  
-}
+    }
+   	if(presentTest != ""){
+   		setTimeout(function(){
+   			alert("Time window to start "+presentTest+" is active!")},400);
+   	}
+   }
 
 //function to validate ongoing test by checking if test session exists
 function validateOngoingTest(callback){
@@ -193,7 +218,6 @@ function startExam(ID,callback){
 
 //callback to startExam
 function checkTest(data){
-    var testDuration;
 	console.log(data);
 	if(data == "false"){
 		alert("Please start test at mentioned Date");
@@ -218,9 +242,9 @@ function checkTest(data){
 				createTest(generateQuestion);
 			    },800)
 			
-			testDuration = duration();
-//set timeout and display countdown
-			timer(testDuration);	
+//get duration and set timer for current test
+			  duration(getDuration);
+				
 		}		
 	
 }
@@ -259,11 +283,11 @@ function generateQuestion(data){
 	questionRow = $.parseJSON(data);
 	markup = '<fieldset class="testFieldset"><input type="hidden" id="questionID" value="'
 	+questionRow[0]+'"><p><i><b>'+questionRow[1]+
-	'</b></i></p><hr><br><input type="radio" name="options" value = 1>'+questionRow[2]+
-	'<br><input type="radio" name="options" value = 2>'+questionRow[3]+
-	'<br><input type="radio" name="options" value = 3>'+questionRow[4]+
-	'<br><input type="radio" name="options" value = 4>'+questionRow[5]+
-	'<br></fieldset>';
+	'</b></i></p><hr><br><label><input type="radio" name="options" value = 1>'+questionRow[2]+
+	'</label><br><label><input type="radio" name="options" value = 2>'+questionRow[3]+
+	'</label><br><label><input type="radio" name="options" value = 3>'+questionRow[4]+
+	'</label><br><label><input type="radio" name="options" value = 4>'+questionRow[5]+
+	'</label><br></fieldset>';
 	$("#onlineTestForm").append(markup);
 	if(questionRow[6] > 0){
 	$("input[name=options][value=" + questionRow[6] + "]").prop('checked', true);
@@ -283,7 +307,6 @@ function saveResult(questionID,checked){
 		     testID : currentTestID,
 		     selectedOption : checked 
 		},
-		async:false,
 		type:"POST",
 		success: function(data){
 		console.log(data);
@@ -337,8 +360,7 @@ function displayResult(data){
 
 //function to get duration of selected test to set timer
 
-function duration(){
-	var currentTestDuration;
+function duration(callback){
 	$.ajax({
 		 url:"../cfc/studentHome.cfc",
 		 data: {
@@ -346,26 +368,27 @@ function duration(){
 			 testID : currentTestID
 		},
 		type:"POST",
-		async:false,
-		success: function(data){
-		currentTestDuration=$.parseJSON(data);
-		},
+		success: callback,
 		error: function(){
 			alert("AJAX error");
 			return false;
 		}
 	});
-	return currentTestDuration;
 }
+//callback for duration. Sets timer
+function getDuration(data){
+	timer($.parseJSON(data));
+	}
 
 //function to start timer at test start and implement force submit when duration exceeds
 
 function timer(n){
 	
 	var dayNow = new Date();
-    var minutes = dayNow.getMinutes() + 1;
- // Set the time we're counting down to
-    n= (n*60*60*1000)- (minutes*60*1000);
+    var minutes = dayNow.getMinutes();
+    var scnds = dayNow.getSeconds();
+ // Set the time we're counting down to (duration - passed time - 10secs[for submission])
+    n= (n*60*60)- (minutes*60)- (scnds) - 10;
  // Define start counter for timer
     var count =0;
 	
@@ -377,12 +400,12 @@ function timer(n){
 
 	    // Find the distance between counter and set time
 	    var distance =n - count;
-	    count = count+1000;
+	    count = count+1;
 	    
 	    // Time calculations for hours, minutes and seconds
-	    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-	    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-	    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+	    var hours = Math.floor((distance % (60 * 60 * 24)) / (60 * 60));
+	    var minutes = Math.floor((distance % (60 * 60)) / 60);
+	    var seconds = Math.floor(distance % 60);
 	    
 	    // Output the result in an element with id="demo"
 	    $("#timer").html(hours + "h "
@@ -405,4 +428,10 @@ function timer(n){
 	        
 	    }
 	}, 1000);
+}
+
+function getFormattedPartTime(partTime){
+    if (partTime<10)
+       return "0"+partTime;
+    return partTime;
 }

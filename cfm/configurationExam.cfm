@@ -1,11 +1,12 @@
-
-<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+<cfif NOT isUserLoggedIn()>
 	<cflocation url="login.cfm" addtoken="no">
-	<cfelse>
-	<cfif session.stLoggedInUser.designation EQ "student">
+<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
+    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
+    <cfset logOutObj.doLogOut() />
+	<cflocation url="login.cfm" addtoken="no">
+<cfelseif session.stLoggedInUser.designation EQ "student">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-	</cfif>
-</cfif>
+<cfelse>
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -20,6 +21,7 @@
 <link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-dd-MMM-yyyy.js"></script>
 
 </head>
 <body>
@@ -27,7 +29,7 @@
 		<div id="header" >
 	<!--logo -->
 		    <div class="logo">
-		    	<a href="login.cfc">
+		    	<a href="login.cfm">
 				<img src="../assets/images/logo2.png" alt="Logo" width="80" height="70" border="0"  id="logo" /></a>
 				<b>Online Examination System</b>
 			</div>
@@ -45,6 +47,7 @@
 <!--header end -->
 
 <!---Add Question --->
+<h3 class="configHeading">Create Exam</h3>
 <div id="addExamData">
 <form class="addQuesForm" id="addQuesForm" method="POST">
 
@@ -68,6 +71,8 @@
 </div><br>
 <input type="button" name="button" id="button" class="login login-submit right addQuestionButton" value="Add Test">
   </form>
+
+
 <!---Modal to add questions to the created test--->
 	<div class="modal hide fade" id="myModal" role="dialog">
     <div class="modal-dialog">
@@ -98,6 +103,53 @@
         </div>
       </div>
   </div>
+  </div>
+
+
+
+
+<hr style="margin-top:3.5vw;">
+<cfset examObj = CreateObject("Component", "examinationSystem.cfc.exams") />
+<cfset examObjQuery = examObj.examAll() />
+
+<cfif #examObjQuery.recordCount#>
+<span id="examHeading"><h3 class="configHeading examHeading";>&#187;&nbsp;View Exams</h3></span>
+	<div class="examTable">
+
+			<!---Question display table--->
+		<table id="examSelectTable" class="display">
+				<thead>
+					<tr>
+						<!--- <th class="hiddenColumn"></th> --->
+						<th>Test ID</th>
+						<th>Test Name</th>
+						<th>Test Date</th>
+                        <th>Duration(hours)</th>
+						<th>Start Time</th>
+                        <th>Created Date</th>
+                    </tr>
+               </thead>
+               <tbody>
+			   <cfloop query="examObjQuery">
+					<tr>
+
+					<!--- <td class="hiddenColumn"></td> --->
+					<td class="examID"><cfoutput>#testID#</cfoutput></td>
+                    <td><cfoutput>#name#</cfoutput></td>
+					<td><cfoutput>#dateformat(startDate,"dd-mmm-yyyy")#</cfoutput></td>
+					<td><cfoutput>#duration#</cfoutput></td>
+                    <td><cfoutput>#TimeFormat(startTime, "HH:mm:ss")#</cfoutput></td>
+					<td><cfoutput>#dateformat(createdDate,"dd-mmm-yyyy")#</cfoutput></td>
+               </tr>
+			</cfloop>
+			</tbody>
+          </table>
+</div>
+<cfelse>
+	<p>No Exams to display. Please add exams</p>
+</cfif>
+
 
 </body>
 </html>
+</cfif>

@@ -19,9 +19,6 @@
 	<cfargument name="country" type="string" required="true" >
 	<cfargument name="zip" type="string" required="true" >
 
-
-
-
     <cftry>
 	<cfset passwordObj = createObject("component","examinationSystem.cfc.hashPassword")/>
     <cfquery result="loginResult" datasource="examinationSystem">
@@ -41,7 +38,7 @@
 		    VALUES
 		    (
 		    <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.fname#" />,
-            <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.mname#" />,
+            <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.mname#" null="#NOT len(arguments.mname)#" />,
             <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#arguments.lname#" />,
             <cfqueryparam cfsqltype="CF_SQL_BIGINT" value="#arguments.phone#" />,
             <cfqueryparam cfsqltype="CF_SQL_BIT" value="1" />,

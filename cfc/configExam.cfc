@@ -16,40 +16,35 @@
 		FROM tests
 		WHERE name=<cfqueryparam value="#arguments.name#" cfsqltype="cf_sql_varchar" />
 	</cfquery>
-	 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-		</cfcatch>
-		</cftry>
 	<cfif #nameCheckQuery.recordcount#>
 		<cfreturn false/>
 		<cfelse>
 		<cfreturn true/>
 	</cfif>
+	<cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+			<p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 	</cffunction>
 
 <!---Return list of time slots already booked for a day--->
 <cffunction name="timeChecker" access="remote" returntype="array" returnformat="JSON">
 	<cfargument name="date" type="string" required="true" >
-	<CFSET  var parsedDate = #CREATEODBCDATETIME("#arguments.date#")#>
 	<cftry>
+	<CFSET  var parsedDate = #CREATEODBCDATETIME("#arguments.date#")#>
+
 	<cfquery name="timeCheckQuery" datasource="examinationSystem">
           SELECT duration,
 		         startTime
 		  FROM tests WHERE
 		  startDate=<cfqueryparam cfsqltype="CF_SQL_DATE" value= #parsedDate# />
 	</cfquery>
-		 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-		</cfcatch>
-		</cftry>
+
 	<cfif #timeCheckQuery.recordcount#>
 		<cfset  myarray=arraynew(1)>
 		<cfset var loopingVar = 1>
@@ -65,6 +60,15 @@
 		<cfelse>
 		<cfreturn []/>
 	</cfif>
+	<cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 	</cffunction>
 
 <!---Insert created test data--->
@@ -73,7 +77,7 @@
 	    <cfargument name="startTime" type="string" required="true" >
 	    <cfargument name="startDate" type="string" required="true" >
 	    <cfargument name="duration" type="string" required="true" >
-
+	    <cftry>
 	    <cfset  var parsedDate = #CREATEODBCDATETIME("#arguments.startDate#")#>
 	    <cfset date =#DateFormat(parsedDate, "yyyy-mm-dd")#>
 	    <cfset  var parsedTime = #CREATEODBCTIME("#arguments.startTime#")#>
@@ -84,7 +88,7 @@
 	    <cfif NOT structKeyExists(session,"stLoggedInUser")>
 		    <cfreturn "does not">
 	    </cfif>
-	    <cftry>
+
 	    <cfquery result="insertExam" datasource="examinationSystem">
 			INSERT INTO tests
 			(
@@ -102,15 +106,16 @@
 		    )
 	    </cfquery>
 	    <cfset session.presentTestID = insertExam.GENERATEDKEY>
-		<cfcatch type = "any">
+	<cfreturn "inserted"/>
+	<cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
-	<cfreturn "inserted"/>
 	</cffunction>
 
 
@@ -121,14 +126,6 @@
 		SELECT questionDescription, questionID FROM questions
 		WHERE isActive = 1
 	 </cfquery>
-     <cfcatch>
-      <cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-      </cfcatch>
-      </cftry>
 	  <cfset questionArr = arraynew(1)>
       <cfloop query="questionAllQuery">
           <cfset questionArray[#currentRow#] =["#questionAllQuery.questionID#",
@@ -136,6 +133,15 @@
 		                                       session.presentTestID] />
 	  </cfloop>
 	  <cfreturn questionArray>
+	  <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 	</cffunction>
 
 
@@ -160,15 +166,17 @@
 
     </cfloop>
     <cfset StructDelete(session, "presentTestID") />
-    <cfcatch type = "any">
-		<cfset type="#cfcatch.Type#" />
-		<cflog type="Error"
-			file="examSystemLogs"
-			text="Exception error --
-			   	  Exception type: #type#" />
-	</cfcatch>
-    </cftry>
+
     <cfreturn true/>
+	<cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
     </cffunction>
 
 </cfcomponent>

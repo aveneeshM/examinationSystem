@@ -19,15 +19,16 @@
 		  FROM tests
 		  ORDER BY createdDate DESC, startTime DESC
 	</cfquery>
-		 <cfcatch type = "any">
+	<cfreturn #examAllQuery#>
+	<cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
-	<cfreturn #examAllQuery#>
 
 	</cffunction>
 
@@ -48,14 +49,6 @@
 		 WHERE isActive = 1
 		 ORDER BY questionID DESC
 		 </cfquery>
-		 <cfcatch type = "any">
-			 <cfset type="#cfcatch.Type#" />
-			 <cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-		 </cfcatch>
-		 </cftry>
 		 <cfset questionArr = arraynew(1)>
 		 <cfset selectedQuestionID = ValueList(questionSelectedQuery.questionID)>
 		 <cfloop query="questionAllQuery">
@@ -68,19 +61,28 @@
 			 "#arguments.testID#",checked] />
 		</cfloop>
 		 <cfreturn questionArray>
+		 <cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 	</cffunction>
 
 <!---Add/update data for testQuestions--->
 <cffunction name="addQuestionTest" access="remote" returntype="string" returnformat="JSON">
 	<cfargument name="questionIDs" type="string" required="true" >
 	<cfargument name="testID" type="string" required="true" >
+	<cftry>
 	<cfquery result="addQuestionTestQuery" datasource="examinationSystem">
 			DELETE FROM testQuestions WHERE
 			testID = <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.testID#" />
 	</cfquery>
 
 	<cfloop list="#arguments.questionIDs#" index="id">
-	<cftry>
 	<cfquery result="addQuestionTestQuery" datasource="examinationSystem">
 			INSERT INTO testQuestions
 			(
@@ -93,15 +95,16 @@
 
 		    )
 	</cfquery>
-		 <cfcatch type = "any">
+    </cfloop>
+    <cfreturn true/>
+	<cfcatch type = "any">
 			<cfset type="#cfcatch.Type#" />
 			<cflog type="Error"
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
-</cfloop>
-<cfreturn true/>
 	</cffunction>
 </cfcomponent>

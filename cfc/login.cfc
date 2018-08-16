@@ -14,25 +14,27 @@
 	<cfquery name="mailCheckQuery" datasource="examinationSystem">
           select emailID from loginDetails where emailID=<cfqueryparam value="#arguments.email#" cfsqltype="cf_sql_varchar" />
 	</cfquery>
-		 <cfcatch type = "any">
-			<cfset type="#cfcatch.Type#" />
-			<cflog type="Error"
-				file="examSystemLogs"
-				text="Exception error --
-				   	  Exception type: #type#" />
-		</cfcatch>
-	</cftry>
 	<cfif #mailCheckQuery.recordcount#>
 		<cfreturn true/>
 		<cfelse>
 		<cfreturn false/>
 	</cfif>
+	<cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 </cffunction>
 
 
 <cffunction name="doLogin" access="remote" returntype="string" returnformat="json">
 	<cfargument name="email" type="string" required="true" >
 	<cfargument name="password" type="string" required="true" >
+	<cftry>
 	<cfset passwordObj = createObject("component","examinationSystem.cfc.hashPassword")/>
 	<cfset passwordHash = passwordObj.hashPassword(arguments.password) />
 
@@ -59,6 +61,15 @@
 	<cfreturn #loginQuery.designation#/>
 	</cfif>
 	<cfreturn #loginQuery.designation#/>
+	<cfcatch type = "any">
+			<cfset type="#cfcatch.Type#" />
+			<cflog type="Error"
+				file="examSystemLogs"
+				text="Exception error --
+				   	  Exception type: #type#" />
+		    <p><b>An Error has occurred</b></p>
+		</cfcatch>
+		</cftry>
 
 </cffunction>
 

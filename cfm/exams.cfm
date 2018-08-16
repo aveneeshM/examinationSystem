@@ -1,11 +1,12 @@
-
-<cfif NOT( isUserLoggedIn() AND structKeyExists(session,"stLoggedInUser"))>
+<cfif NOT isUserLoggedIn()>
 	<cflocation url="login.cfm" addtoken="no">
-	<cfelse>
-	<cfif session.stLoggedInUser.designation EQ "student">
+<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
+    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
+    <cfset logOutObj.doLogOut() />
+	<cflocation url="login.cfm" addtoken="no">
+<cfelseif session.stLoggedInUser.designation EQ "student">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-	</cfif>
-</cfif>
+<cfelse>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
@@ -51,7 +52,7 @@
 <cfif #examObjQuery.recordCount#>
 
 	<div class="examListTable">
-		<h3>Tests</h3><br>
+		<h3>Exams</h3><br>
 			<!---Question display table--->
 		<table id="examSelectTable" class="display">
 				<thead>
@@ -82,7 +83,7 @@
           </table>
 </div>
 <!---Modal to add questions to a test--->
-	<div class="modal hide fade" id="myModal" role="dialog">
+	<div class="modal hide fade modalWidth" id="myModal" role="dialog">
     <div class="modal-dialog">
 
       <!-- Modal content-->
@@ -93,7 +94,7 @@
         <div class="modal-body">
 			<form class="testQuesForm" id="testQuesForm" method="POST">
 				<input type="hidden" id="testID">
-			<table id="questionSelectTable" class="display">
+			<table id="questionSelectTable" class="display" cellspacing="0">
 				<thead>
 					<tr>
 						<th>Question</th>
@@ -119,3 +120,4 @@
 
 </body>
 </html>
+</cfif>

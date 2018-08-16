@@ -2,8 +2,9 @@ $(document).ready(function () {
 
 //display all upcoming tests
 	futureTests(generateTests);
+	
 //start test button response 	 
-	 $(".selectTest").on("click", function(e){
+	$("#examDisplayTable").on("click",".selectTest", function(e){
 	        e.preventDefault();
 //Function call with testID as argument to start exam
 	        addExam($(this).val());
@@ -76,13 +77,11 @@ function generateTests(data){
 	console.log(data);
     displayTests(data);
     $('#examDisplayTable').DataTable( {
-	   paging:false,
-	   scrollY:"480px",
-	   scrollCollapse: true,
-	   "aaSorting": [[1,'asc'], [2,'asc']],
-       "columnDefs": [
-         {"className": "dt-center", "targets": "_all"},
-         { type: 'date-dd-mmm-yyyy', targets: 1 }
-       ]
-    });
+		   "aaSorting": [[1,'asc'], [2,'asc']],
+	       "columnDefs": [
+	         {"className": "dt-center", "targets": "_all"},
+	         { type: 'date-dd-mmm-yyyy', targets: 1 }
+	       ]
+	    });
+    
 }
