@@ -16,7 +16,7 @@
 <!---selects all future tests available--->
 		<cffunction name="getTest" access="remote" returnformat="JSON">
 		 	<cftry>
-		    <cfquery name="testAllQuery" datasource="examinationSystem">
+		    <cfquery name="testAllQuery">
 		      SELECT testID,
 		             name,
 		             duration,
@@ -33,14 +33,13 @@
 		   <cfset var arrayCounter = 1>
 		   <cfloop query="testAllQuery">
 
-
-
+		   <!---select test if its start date/time > present date/time--->
            <cfif (testAllQuery.startDate EQ DATEFORMAT(NOW(),"yyyy-mm-dd")
 		              AND timeformat(testAllQuery.startTime,'HH:mm:ss') GT TIMEFORMAT(NOW(),"HH:mm:ss"))
 		          OR (testAllQuery.startDate GT DATEFORMAT(NOW(),"yyyy-mm-dd"))>
 
-				 <cfset testArray[arrayCounter] =[testAllQuery.testID, testAllQuery.name,
-				     testAllQuery.duration, #DATEFORMAT(testAllQuery.startDate,"dd-mmm-yyyy")#,
+				 <cfset var testArray[arrayCounter] =[testAllQuery.testID, testAllQuery.name,
+				     testAllQuery.duration, DATEFORMAT(testAllQuery.startDate,"dd-mmm-yyyy"),
 				     TIMEFORMAT(testAllQuery.startTime,"HH:mm:ss")] />
 
 				     <cfset var arrayCounter = arrayCounter + 1>
@@ -54,7 +53,7 @@
 				text="Exception error --
 				   	  Exception type: #type#
 				   	  ,Message:#cfcatch.Message#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn false>
 		</cfcatch>
 		</cftry>
 	   </cffunction>
@@ -63,7 +62,7 @@
 	   <cffunction name="addTest" access="remote" returnformat="JSON">
 		   <cfargument name="testID" type="numeric" required="true">
 			<cftry>
-		    <cfquery result="testAddQuery" datasource="examinationSystem">
+		    <cfquery result="testAddQuery">
 		      INSERT INTO testStudent
 			(
 			testID,testTakerID
@@ -81,7 +80,7 @@
 				text="Exception error --
 				   	  Exception type: #type#
 				   	  ,Message:#cfcatch.Message#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn false>
 		</cfcatch>
 		</cftry>
 	</cffunction>

@@ -1,12 +1,7 @@
-<cfif NOT isUserLoggedIn()>
-	<cflocation url="login.cfm" addtoken="no">
-<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
-    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
-    <cfset logOutObj.doLogOut() />
-	<cflocation url="login.cfm" addtoken="no">
-<cfelseif session.stLoggedInUser.designation EQ "student">
+<cfinclude template="loginValidation.cfm">
+<cfif session.stLoggedInUser.designation EQ "student">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-<cfelse>
+</cfif>
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -84,4 +79,3 @@
 
 </body>
 </html>
-</cfif>

@@ -8,13 +8,21 @@
 <cfcomponent accessors="true" displayname="Application" output="false" persistent="false">
 
     <!--- Set up the application. --->
-    <cfset THIS.Name = "ExaminationSystem" />
+    <cfset THIS.Name = "myExaminationSystem1" />
     <cfset THIS.ApplicationTimeout = CreateTimeSpan( 1, 0, 0, 0 ) />
     <cfset THIS.datasource = "examinationSystem" />
 	<cfset THIS.sessionManagement="Yes" />
-	<cfset THIS.sessiontimeout = #CreateTimeSpan(0,5,0,0)# />
+	<cfset THIS.sessiontimeout = CreateTimeSpan(0,5,0,0) />
 
     <cffunction name="OnApplicationStart" returntype="boolean">
+		<!--- Set up instance to login component --->
+		<cfset application.logOutObj = CreateObject("Component", "cfc.login") />
+		<!--- Set up instance to teacherHome component --->
+		<cfset application.teacherObj = CreateObject("Component", "cfc.teacherHome") />
+		<!--- Set up instance to exams component --->
+		<cfset application.examObj = CreateObject("Component", "cfc.exams") />
+		<!--- Set up instance to studentHome component --->
+		<cfset application.studentObj = CreateObject("Component", "cfc.studentHome") />
         <cfreturn true />
     </cffunction>
 

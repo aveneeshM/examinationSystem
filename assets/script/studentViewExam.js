@@ -3,12 +3,11 @@ $(document).ready(function () {
 //display all upcoming tests
 	futureTests(generateTests);
 	
-//start test button response 	 
+//select test button response 	 
 	$("#examDisplayTable").on("click",".selectTest", function(e){
 	        e.preventDefault();
-//Function call with testID as argument to start exam
+//Function call with testID as argument to add exam
 	        addExam($(this).val());
-	     
 	    });
 
 })
@@ -32,7 +31,6 @@ function displayTests(data){
     }  
 }
 
-
 //function to record users response
 function addExam(testID){
 	 $.ajax({
@@ -44,6 +42,10 @@ function addExam(testID){
 		type:"POST",
 		success: function(data){
 		console.log(data);
+		if(data =="false"){
+			window.location ="error.cfm";
+			return false;
+		}
 		alert("Test added to dashboard");
 		location.reload();
 		},
@@ -51,12 +53,11 @@ function addExam(testID){
 			alert("AJAX error");
 			return false;
 		}
-	});
- 
+	}); 
 }
 
+//function to get all upcoming test
 function futureTests(callback){
-//get list of upcoming tests
 $.ajax({
 	 url:"../cfc/studentViewExam.cfc",
 	 data: {
@@ -72,8 +73,12 @@ $.ajax({
 });
 }
 
-//
+//callback to futureTests
 function generateTests(data){
+	if(data =="false"){
+		window.location ="error.cfm";
+		return false;
+	}
 	console.log(data);
     displayTests(data);
     $('#examDisplayTable').DataTable( {

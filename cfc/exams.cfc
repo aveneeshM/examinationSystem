@@ -7,9 +7,10 @@
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
 
+<!---function to get list of all exams--->
 <cffunction name="examAll" access="public">
 	<cftry>
-	<cfquery name="examAllQuery" datasource="examinationSystem">
+	<cfquery name="examAllQuery">
           SELECT name,
 		         testID,
 		         createdDate,
@@ -26,38 +27,40 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
+</cffunction>
 
-	</cffunction>
 
-
-<!---get all questions. Check questions already selectd in the test--->
+<!---function to get list of all questions. Check questions already selected in the test--->
 <cffunction name="testQuestion" access="remote" returnformat="JSON">
 	<cfargument name="testID" type="numeric" required="true" >
 	<cftry>
-		<cfquery name="questionSelectedQuery" datasource="examinationSystem">
+		<!---Query to get selected questions of a test--->
+		<cfquery name="questionSelectedQuery">
 		 SELECT questionID
 		 FROM testQuestions
 		 WHERE testID = <cfqueryparam value="#arguments.testID#" cfsqltype="cf_sql_integer" />
 		 </cfquery>
-		<cfquery name="questionAllQuery" datasource="examinationSystem">
+
+		 <!---Query to get all active questions--->
+		<cfquery name="questionAllQuery">
 		 SELECT questionDescription,
 		        questionID
 		 FROM questions
 		 WHERE isActive = 1
 		 ORDER BY questionID DESC
 		 </cfquery>
-		 <cfset questionArr = arraynew(1)>
-		 <cfset selectedQuestionID = ValueList(questionSelectedQuery.questionID)>
+		 <cfset var questionArr = arraynew(1)>
+		 <cfset var selectedQuestionID = ValueList(questionSelectedQuery.questionID)>
 		 <cfloop query="questionAllQuery">
 			 <cfif ListFind(selectedQuestionID, questionAllQuery.questionID)>
 				 <cfset var checked = "checked">
 				 <cfelse>
 				 <cfset var checked = "">
 			</cfif>
-			 <cfset questionArray[#currentRow#] =["#questionAllQuery.questionID#", "#questionAllQuery.questionDescription#",
+			<!---array of all questions where selected questions are checked--->
+			 <cfset questionArray[currentRow] =["#questionAllQuery.questionID#", "#questionAllQuery.questionDescription#",
 			 "#arguments.testID#",checked] />
 		</cfloop>
 		 <cfreturn questionArray>
@@ -67,7 +70,7 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn false>
 		</cfcatch>
 		</cftry>
 	</cffunction>
@@ -77,13 +80,13 @@
 	<cfargument name="questionIDs" type="string" required="true" >
 	<cfargument name="testID" type="string" required="true" >
 	<cftry>
-	<cfquery result="addQuestionTestQuery" datasource="examinationSystem">
+	<cfquery result="addQuestionTestQuery">
 			DELETE FROM testQuestions WHERE
 			testID = <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.testID#" />
 	</cfquery>
 
 	<cfloop list="#arguments.questionIDs#" index="id">
-	<cfquery result="addQuestionTestQuery" datasource="examinationSystem">
+	<cfquery result="addQuestionTestQuery">
 			INSERT INTO testQuestions
 			(
 			questionID,testID
@@ -103,7 +106,7 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn false>
 		</cfcatch>
 		</cftry>
 	</cffunction>

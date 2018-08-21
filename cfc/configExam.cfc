@@ -7,16 +7,16 @@
   --->
 <cfcomponent accessors="true" output="false" persistent="false">
 
-<!---Check if test name already taken--->
+<!---Functionn to check if test name already taken--->
 <cffunction name="nameChecker" access="remote" returntype="string" returnformat="JSON">
 	<cfargument name="name" type="string" required="true" >
 	<cftry>
-	<cfquery name="nameCheckQuery" datasource="examinationSystem">
+	<cfquery name="nameCheckQuery">
         SELECT name
 		FROM tests
 		WHERE name=<cfqueryparam value="#arguments.name#" cfsqltype="cf_sql_varchar" />
 	</cfquery>
-	<cfif #nameCheckQuery.recordcount#>
+	<cfif nameCheckQuery.recordcount>
 		<cfreturn false/>
 		<cfelse>
 		<cfreturn true/>
@@ -27,36 +27,36 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-			<p><b>An Error has occurred</b></p>
+				<cfreturn "error">
 		</cfcatch>
 		</cftry>
-	</cffunction>
+</cffunction>
 
 <!---Return list of time slots already booked for a day--->
-<cffunction name="timeChecker" access="remote" returntype="array" returnformat="JSON">
+<cffunction name="timeChecker" access="remote" returnformat="JSON">
 	<cfargument name="date" type="string" required="true" >
 	<cftry>
-	<CFSET  var parsedDate = #CREATEODBCDATETIME("#arguments.date#")#>
+	<cfset  var parsedDate = CREATEODBCDATETIME("#arguments.date#")>
 
-	<cfquery name="timeCheckQuery" datasource="examinationSystem">
+	<cfquery name="timeCheckQuery">
           SELECT duration,
 		         startTime
-		  FROM tests WHERE
-		  startDate=<cfqueryparam cfsqltype="CF_SQL_DATE" value= #parsedDate# />
+		  FROM tests
+		  WHERE startDate=<cfqueryparam cfsqltype="CF_SQL_DATE" value= #parsedDate# />
 	</cfquery>
 
-	<cfif #timeCheckQuery.recordcount#>
-		<cfset  myarray=arraynew(1)>
+	<cfif timeCheckQuery.recordcount>
+		<cfset var myarray=arraynew(1)>
 		<cfset var loopingVar = 1>
 		<cfloop query = "timeCheckQuery">
-
+		    <!---loop from start time to mentioned duration--->
 			<cfloop index = "LoopCount" from = "0" to = "#timeCheckQuery.duration - 1#" step = "1">
-            <CFSET var endTime = TIMEFormat(#DateAdd("h", #LoopCount#, #timeCheckQuery.startTime#)#, "HH:mm:ss")>
-			<cfset myarray[#loopingVar#]=#endTime#>
-			<cfset loopingVar+=1>
+            <cfset var endTime = TIMEFormat(DateAdd("h", LoopCount, timeCheckQuery.startTime), "HH:mm:ss")>
+			<cfset var myarray[loopingVar]=endTime>
+			<cfset var loopingVar+=1>
             </cfloop>
         </cfloop>
-		<cfreturn #myarray#/>
+		<cfreturn myarray/>
 		<cfelse>
 		<cfreturn []/>
 	</cfif>
@@ -66,7 +66,7 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn "error">
 		</cfcatch>
 		</cftry>
 	</cffunction>
@@ -78,18 +78,11 @@
 	    <cfargument name="startDate" type="string" required="true" >
 	    <cfargument name="duration" type="string" required="true" >
 	    <cftry>
-	    <cfset  var parsedDate = #CREATEODBCDATETIME("#arguments.startDate#")#>
-	    <cfset date =#DateFormat(parsedDate, "yyyy-mm-dd")#>
-	    <cfset  var parsedTime = #CREATEODBCTIME("#arguments.startTime#")#>
-	    <cfset date =#LSTimeFormat(parsedTime, "hh:mm:ss")# >
-	    <cfset  myarray=arraynew(1)>
-	    <cfset myarray[1]=#date#>
-	    <cfset myarray[2]=#parsedTime#>
 	    <cfif NOT structKeyExists(session,"stLoggedInUser")>
 		    <cfreturn "does not">
 	    </cfif>
 
-	    <cfquery result="insertExam" datasource="examinationSystem">
+	    <cfquery result="insertExam">
 			INSERT INTO tests
 			(
 			name,createdDate,duration,testCreatorID,startDate,startTime
@@ -113,24 +106,23 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn "error">
 		</cfcatch>
 		</cftry>
 	</cffunction>
 
-
 <!---get list of all questions to add in the newly created test--->
 	<cffunction name="testQuestion" access="remote" returnformat="JSON">
      <cftry>
-     <cfquery name="questionAllQuery" datasource="examinationSystem">
+     <cfquery name="questionAllQuery">
 		SELECT questionDescription, questionID FROM questions
 		WHERE isActive = 1
 	 </cfquery>
-	  <cfset questionArr = arraynew(1)>
+	  <cfset var questionArray = arraynew(1)>
       <cfloop query="questionAllQuery">
-          <cfset questionArray[#currentRow#] =["#questionAllQuery.questionID#",
-		                                       "#questionAllQuery.questionDescription#",
-		                                       session.presentTestID] />
+          <cfset var questionArray[currentRow] =["#questionAllQuery.questionID#",
+		                                        "#questionAllQuery.questionDescription#",
+		                                        session.presentTestID] />
 	  </cfloop>
 	  <cfreturn questionArray>
 	  <cfcatch type = "any">
@@ -139,11 +131,9 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
 	</cffunction>
-
 
 <!---Add all selected questions to the test--->
 	<cffunction name="addQuestionTest" access="remote" returntype="string" returnformat="JSON">
@@ -151,7 +141,7 @@
     <cftry>
 	<cfloop list="#arguments.questionIDs#" index="id">
 
-	<cfquery result="addQuestionTestQuery" datasource="examinationSystem">
+	<cfquery result="addQuestionTestQuery">
 			INSERT INTO testQuestions
 			(
 			questionID,testID
@@ -174,7 +164,6 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
 		</cfcatch>
 		</cftry>
     </cffunction>

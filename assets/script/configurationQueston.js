@@ -23,16 +23,14 @@ $(document).ready(function () {
 	                    return false;
 	                }
 	            }
-	        	
-	        	
-	          //  $(':checkbox:checked').each(function(i){
+
 	        	$(':radio:checked').each(function(i){
 	            	  val=1;
 	            	  optionArray[i]=$(this).val();
 	              
 	            });
 		        if(val == 1){
-		        	addQuestion(optionArray);
+		        	addQuestion();
 		        }
 		        else{
 		        	alert("Select answer");

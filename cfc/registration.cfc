@@ -21,7 +21,7 @@
 
     <cftry>
 	<cfset passwordObj = createObject("component","examinationSystem.cfc.hashPassword")/>
-    <cfquery result="loginResult" datasource="examinationSystem">
+    <cfquery result="loginResult">
 			INSERT INTO loginDetails
 		    VALUES
 		    (
@@ -30,7 +30,7 @@
 		    )
 	</cfquery>
 
-	<cfquery result="personResult" datasource="examinationSystem">
+	<cfquery result="personResult">
 			INSERT INTO person
 			(
 			firstName,middleName,lastName,contactNumber,isActive,designation,loginID
@@ -47,7 +47,7 @@
 		    )
 	</cfquery>
 
-	<cfquery result="addressResult" datasource="examinationSystem">
+	<cfquery result="addressResult">
 			INSERT INTO addressDetails
 			(
 			personID,addressLine,city,state,country,zipCode

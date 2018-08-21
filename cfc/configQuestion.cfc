@@ -22,7 +22,7 @@
 	<cfif NOT structKeyExists(session,"stLoggedInUser")>
 		<cfreturn "does not">
 	</cfif>
-	<cfquery result="insertOptions" datasource="examinationSystem">
+	<cfquery result="insertOptions">
 			INSERT INTO questions
 			(
 			questionDescription,difficultyLevel,createdDate,option1,option2,option3,option4,isCorrect
@@ -46,7 +46,7 @@
 				file="examSystemLogs"
 				text="Exception error --
 				   	  Exception type: #type#" />
-		    <p><b>An Error has occurred</b></p>
+		    <cfreturn false/>
 		</cfcatch>
 		</cftry>
   </cffunction>

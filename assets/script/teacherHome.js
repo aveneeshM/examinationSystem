@@ -1,8 +1,9 @@
+//global variable declaration
 var table;
 $(document).ready(function () {
 	table = $('#questionSelectTable').DataTable({
 		"aaSorting": [1,'desc'],
-//allign elements at centre
+        //allign column values at centre
 		"columnDefs": [
 	        {"className": "dt-center", "targets": "_all"}
 	      ],
@@ -20,7 +21,7 @@ $(document).ready(function () {
 	                pageSize: 'LEGAL'
 	            }
 	        ],
-	      
+	        //row callback to colour each row that is to be generated for display
 	        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
                 if ( aData[0] == "Inactive" )
                 {
@@ -41,7 +42,7 @@ $(document).ready(function () {
 		paging:false
 	});
 	
-	//select active/inactive/all questions
+	//On select active/inactive/all questions
 	$('.questionStatus input[type="radio"]').on('change', function() {
 		
 		
@@ -60,7 +61,7 @@ $(document).ready(function () {
 		   }
 		});
 	
-	//table row on click will will extract selected question options and call function to open editing modal 
+	//table row on click will extract selected question options and call function to open editing modal 
 	$("#questionSelectTable tbody").on('click', 'tr', function () {
 	    var extractedID = $(this).find(".questionID").text();
 	    $.ajax({
@@ -71,6 +72,10 @@ $(document).ready(function () {
 			},
 			type:"POST",
 			success: function(data){
+			if(data == '"error"'){
+		    	alert("An error has occured. Please try after some time");
+		    	return false;
+			}
 			console.log(data);
 		    displayQuestion(data);
 			},
@@ -82,9 +87,7 @@ $(document).ready(function () {
 	    
 	});
 	
-	
-	
-	//Response to Save Edit button
+	//Response to save-changes button 
 	$('#optionSubmit').click(function(e) {
 		var checked = [], status;
         $('#optionSelectTable :radio:checked').each(function(i){
@@ -109,7 +112,7 @@ $(document).ready(function () {
 			success: function(data){
 			if(data == "false"){
 				console.log(data);
-				alert("Question editing failed");
+				alert("Question editing failed. Please try after sometime");
 				return false;
 	        }
 			else{
@@ -131,15 +134,14 @@ $(document).ready(function () {
 });
 
 
-// function to display edit question modal
+// function to display edit-question modal
 function displayQuestion(data){
 	
     var question = $.parseJSON(data),check,tempID;
-    console.log(question);
     $("#optionSelectTable > tbody").html("");
     $(".questionStatement").html("");
     $(".quesID").html("");
-    $('#quesID').html("&nbsp;OES"+question[0]+" : &nbsp");
+    $('#quesID').html("&nbsp;Question "+question[0]+" : &nbsp");
    	$('.questionStatement').html("&nbsp"+question[1]+"<br><br>");
     $("#getQuesID").val(question[0]);
     
@@ -149,7 +151,7 @@ function displayQuestion(data){
     else{
     	$("#status").prop("checked", false);
     }
-    
+    //loop through options and add them to table 
    	for(var i=0; i<4;i++){
    		if(question[6].indexOf(++i) >= 0){
    			check = "checked";
@@ -159,12 +161,12 @@ function displayQuestion(data){
    		}
     	i--;
    		tempID = i+1;
-    	var markup = '<tr><td align="center"> <input type="radio" name="optionSelector" value='
-    		+ tempID +' '+check+' ></td><td align="center">'+question[i+2]+'</td></tr>';
+    	var markup = '<tr><td align="center">'+question[i+2]+
+    	             '</td><td align="center"> <input type="radio" name="optionSelector" value='+
+		             tempID +' '+check+' ></td></tr>';
        	$("#optionSelectTable tbody").append(markup);
-    	$('#myModal').modal('show'); 
     } 
-    
+   	$('#myModal').modal('show'); 
     
 }
 

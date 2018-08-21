@@ -1,8 +1,8 @@
 //global variable declaration
-var returnTime, allTime,testNameCheck,test;
+var returnTime, allTime, testNameCheck, test;
 $(document).ready(function () {
 	
-	//List of Exams Table
+	//add datatable to exam display table
 	$('#examSelectTable').DataTable({
 		info:false,
 		"aaSorting": [5,'desc'],
@@ -12,12 +12,10 @@ $(document).ready(function () {
 	      ],
 	      
 	});
-	
+	//on click toggle exam display table
 	$( "#examHeading" ).on("click",function() {
 		  $( "div.ExamTable" ).toggle( "slow");
 		});
-	
-	
 	
 	$("#testName").on("blur", function (e) {
         nameCheck();
@@ -51,7 +49,7 @@ $(document).ready(function () {
         else{
         	
         	$('#timePicker').html("");
-       //Display available time slots for the day. set returnTime to available time slots
+            //Display available time slots for the day. set returnTime to available time slots
         	timeCheck(timeChecker);
         	
         	
@@ -113,7 +111,6 @@ $(document).ready(function () {
         	return false;
         }
         if(testNameCheck == 0){
-        	alert("Existing test. Choose a different name.");
         	return false;
         }
         if(!validateNumber("#duration")){
@@ -183,14 +180,17 @@ if(data == "true"){
     $(testName).css("border","1px solid #a9a9a9");
     testNameCheck = 1;
 }
-else{
+else if (data == "false"){
     $(testName).css("border","1px solid #ff0000");
     testNameCheck = 0;
     alert("Existing test. Choose a different name.");
+}
+else{
+    testNameCheck = 0;
+    window.location = "error.cfm";
 
 }
 }
-
 //get all selected time slots for the date
 function timeCheck(callback) {
 	
@@ -211,6 +211,9 @@ function timeCheck(callback) {
 
 //callback to timeCheck. set all available time slots to returnTime
 function timeChecker(data){
+	if(data == '"error"'){
+		window.location = "error.cfm";
+	}
     returnTime = data;
 	var presentTS = new Date();
 	var timeIndex;
@@ -219,15 +222,14 @@ function timeChecker(data){
 		"08:00:00","09:00:00","10:00:00","11:00:00","12:00:00","13:00:00","14:00:00",
 		"15:00:00","16:00:00","17:00:00","18:00:00","19:00:00","20:00:00","21:00:00",
 		"22:00:00","23:00:00"];
-	
+	//sets all available time slots to return time
 	returnTime = allTime.filter( function( el ) {
 		  return !returnTime.includes( el );
 		});
 
-	
+	//If selected date is todays date, remove passed time 
 	if (date == $("#datetext").val()){
 		var datetext = presentTS.toTimeString().split(' ')[0];
-		
 		$.each(returnTime, function( index, value ) {
 			  if(value <= datetext){
 				  timeIndex =index;
@@ -270,9 +272,12 @@ function addTest(callback) {
 //callback to function addTest
 function displayTest(data){
 	console.log(data);
+	if(data == '"error"'){
+		window.location = "error.cfm";
+		return false;
+	}
     alert("exam added");
     displayQuestion(addQuestions)
-    //$(".examTable").show("slow");
 }
 //function to validate duration
 function validateNumber(number) {
@@ -296,8 +301,8 @@ function validateNumber(number) {
         }
     
 }
-//Executed when time is changed
-//function to validate if chosen time+duration does not clashes with any other test
+/*Executed when time is changed.
+function to validate if chosen time+duration does not clashes with any other test*/
 function validateTime(selectedTime){
 	var duration =$("#duration").val();
 		

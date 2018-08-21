@@ -1,17 +1,10 @@
-
-<cfif NOT isUserLoggedIn()>
-	<cflocation url="login.cfm" addtoken="no">
-<cfelseif  NOT structKeyExists(session,"stLoggedInUser")>
-    <cfset logOutObj = CreateObject("Component", "examinationSystem.cfc.login") />
-    <cfset logOutObj.doLogOut() />
-	<cflocation url="login.cfm" addtoken="no">
-<cfelseif session.stLoggedInUser.designation EQ "teacher">
+<cfinclude template="loginValidation.cfm">
+<cfif session.stLoggedInUser.designation EQ "teacher">
 		<cflocation url="accessDenied.cfm" addtoken="no">
-<cfelse>
+</cfif>
 
 <cfif structKeyExists(session,"testData")>
-<cfset saveDeleteObj = CreateObject("Component", "examinationSystem.cfc.studentHome") />
-<cfset saveDeleteObj.submitStopTest() />
+<cfset application.studentObj.submitStopTest() />
 <cflocation url="studentHome.cfm" addtoken="no">
 
 
@@ -22,13 +15,13 @@
 <script src="../assets/script/logout.js"> </script>
 <script src="../assets/script/studentHome.js"> </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
-<link rel="stylesheet" href="../assets/css/style.css" media="screen" type="text/css" />
-<link rel="stylesheet" href="../assets/css/loggedInStyle.css" media="screen" type="text/css" />
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-dd-MMM-yyyy.js"></script>
+<link rel="stylesheet" href="../assets/css/style.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="../assets/css/loggedInStyle.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="../assets/css/modal.css" media="screen" type="text/css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 </head>
 
 <body>
@@ -51,28 +44,27 @@
 
 		</div><br>
 <!--header end -->
-<!---Upcoming Exam Table--->
+<!---Selected Upcoming Exam Table--->
 <h3 class="largeMargin largePadding">Exams:</h3><br>
 
 <div class="examList Display">
 	<form class="examDisplayForm" id="examDisplayForm" method="POST">
-				<input type="hidden" id="testID">
-	<!---	<div id="countdowntimer"><span id="future_date"><span></div>--->
-			<table id="examDisplayTable" class="display">
-				<thead>
-					<tr>
-						<th>Test</th>
-                        <th>Test Date</th>
-						<th>Test Time</th>
-						<th>Take Test</th>
-                    </tr>
-               </thead>
-               <tbody>
-			</tbody>
-          </table>
-		</form>
+		<input type="hidden" id="testID">
+		<table id="examDisplayTable" class="display">
+			<thead>
+				<tr>
+					<th>Test</th>
+                    <th>Test Date</th>
+				    <th>Test Time</th>
+				    <th>Take Test</th>
+                </tr>
+           </thead>
+           <tbody>
+		   </tbody>
+      </table>
+    </form>
 	</div>
-<!---Test Modal--->
+<!---Online Test Modal--->
 	<div class="modal hide fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -97,4 +89,3 @@
 </div>
 </body>
 </html>
-</cfif>

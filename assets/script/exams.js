@@ -1,11 +1,11 @@
+//global variable declaration
 var table;
 $(document).ready(function () {
 
-//Add datatable to created exam table	
+//Add datatable on created exam table	
 	$('#examSelectTable').DataTable({
 		info:false,
 		"aaSorting": [[2,'desc'],[4,'desc']],
-		//ordering:false,
 		"columnDefs": [
 	        {"className": "dt-center", "targets": "_all"},
 	        { type: 'date-dd-mmm-yyyy', targets: [2,5] }
@@ -13,7 +13,7 @@ $(document).ready(function () {
 	      
 	});
 	
-//Add on click event to table rows
+//On click event for table rows
 	$("#examSelectTable tbody").on('click', 'tr', function () {
 		
 
@@ -27,6 +27,10 @@ $(document).ready(function () {
 			type:"POST",
 			async:false,
 			success: function(data){
+			if(data == "false"){
+				window.location = "error.cfm";
+				return false;
+			}
 			console.log(data);
 			if ( $.fn.DataTable.isDataTable('#questionSelectTable') ) {
 		    	  $('#questionSelectTable').DataTable().destroy();
@@ -39,10 +43,6 @@ $(document).ready(function () {
 				            { "orderDataType": "dom-checkbox" }
 				        ],
 				        "aaSorting": [[1,'desc'],[0,'asc']],
-				        //"paging":false,
-				 	    //"scrollY":"420px",
-				 	    //"scrollCollapse": true,
-
 				        });
 			},
 			error: function(){
@@ -52,9 +52,10 @@ $(document).ready(function () {
 		}); 
 	});
 	
-//event handler to Question Submit button
+//event handler to question-selection Submit button
 	$('#quesSubmit').click(function(e) {
 		var checked = [];
+		//get all checked questions
         table.$(':checkbox:checked').each(function(i){
       	  checked[i]=$(this).val();
         
@@ -77,19 +78,16 @@ $(document).ready(function () {
 			else{
 				$('#myModal').modal('hide');
 				$("#testQuesForm")[0].reset();
-				
 	        }
-
 			},
 			error: function(){
 				alert("AJAX error");
 				return false;
 			}
 		}); 
-		
 	})
 });
-//add content to question select modal
+//add all questions(checked and unchecked) to question select modal
 function displayQuestion(data){
 	
    var question = $.parseJSON(data);
@@ -107,13 +105,9 @@ function displayQuestion(data){
     $('#testID').val(question[1][2]);
     
 }
-
+//For ordering checkboxes in datatable
 $.fn.dataTable.ext.order['dom-checkbox'] = function  ( settings, col ){
     return this.api().column( col, {order:'index'} ).nodes().map( function ( td, i ) {
         return $('input', td).prop('checked') ? '1' : '0';
     } );
 }
-
-
-
-
