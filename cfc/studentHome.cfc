@@ -25,7 +25,7 @@
 		   <cfset var testArray = arraynew(1)>
 		   <cfloop query="testAllQuery">
 			   <cfset var testResult = testAllQuery.result>
-			   <cfset var checkTimeWindow= TIMEFORMAT(DateAdd("n",59,testAllQuery.startTime),"HH:mm:ss")>
+			   <cfset var checkTimeWindow= TIMEFORMAT(DateAdd("n",15,testAllQuery.startTime),"HH:mm:ss")>
 
                <!---If selected-test start time has already passed. Set its result to 0--->
 			   <cfif (DATEFORMAT(testAllQuery.startDate,"yyyy-mm-dd") LT DATEFORMAT(NOW(),"yyyy-mm-dd")) OR
@@ -63,7 +63,7 @@
 
 
 
-<!---starts test if current time is in start time window of 15(59 for now) mins---->
+<!---starts test if current time is in start time window of 15 mins---->
 	   <cffunction name="checkTest" access="remote" returnformat="JSON">
 		   <cfargument name="testID" type="numeric" required="true" >
 		   <cftry>
@@ -80,7 +80,7 @@
 		   <cfif DATEFORMAT(testQuery.startDate,"yyyy-mm-dd") EQ DATEFORMAT(NOW(),"yyyy-mm-dd")>
 
 			  <!---Create a time window to start the test--->
-		      <cfset checkTime= TIMEFORMAT(DateAdd("n",59,testQuery.startTime),"HH:mm:ss")>
+		      <cfset checkTime= TIMEFORMAT(DateAdd("n",15,testQuery.startTime),"HH:mm:ss")>
 
 			  <!---StartTestCondition2:Check if test start time is in created time window--->
 		      <cfif TIMEFORMAT(Now(),"HH:mm:ss") LTE checkTime AND
