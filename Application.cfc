@@ -35,9 +35,16 @@
 		<cflog file="examSystemLogs" type="error"
                    text="Message: #Arguments.Exception.message#">
 		<cfoutput><h2>An unexpected error has occurred. Please try after some time.</h2> </cfoutput>
-
-
 	</cffunction>
+
+	<cffunction name="OnMissingTemplate" returntype="void">
+       <cflog type="information"
+			file="tryLogs"
+			text="MissingTemplate" />
+			<cfoutput><h2>Requested page not found</h2></cfoutput>
+			<cfreturn />
+
+    </cffunction>
 
 
 </cfcomponent>
